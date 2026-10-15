@@ -15,6 +15,14 @@
   color: var(--accent);
 }
 
+.app__booking {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  align-items: start;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
 .app__rooms {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));

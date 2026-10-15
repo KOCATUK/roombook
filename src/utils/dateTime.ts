@@ -44,6 +44,11 @@ export function getDatePart(value: LocalDateTime): string {
   return value.slice(0, 10)
 }
 
+/** DD.MM.YYYY */
+export function formatDate(value: LocalDateTime): string {
+  return `${value.slice(8, 10)}.${value.slice(5, 7)}.${value.slice(0, 4)}`
+}
+
 /** HH:mm */
 export function formatTime(value: LocalDateTime): string {
   return value.slice(11, 16)
