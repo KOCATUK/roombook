@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RoomBook · Концепт B · Яркий стиль (сетка по часам)</title>
+<style>
+:root{--ink:#1d1b3a;--muted:#6b6a86}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#fff3e6 0%,#ffe1ef 55%,#e7e3ff 100%);color:var(--ink);font:16px/1.4 "Trebuchet MS","Segoe UI",system-ui,sans-serif;min-height:100vh}
+.wrap{max-width:1240px;margin:0 auto;padding:22px 28px}
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.logo{font-size:26px;font-weight:800;letter-spacing:-.02em}.logo i{font-style:normal;background:linear-gradient(90deg,#ff7a18,#ff3d81);-webkit-background-clip:text;background-clip:text;color:transparent}
+.ctl{display:flex;gap:12px;align-items:center}.date{background:#fff;border-radius:999px;padding:9px 18px;font-weight:700;box-shadow:0 4px 14px rgba(255,61,129,.18)}
+.new{background:linear-gradient(90deg,#ff7a18,#ff3d81);color:#fff;border-radius:999px;padding:10px 22px;font-weight:800;box-shadow:0 6px 18px rgba(255,61,129,.35)}
+.grid{background:rgba(255,255,255,.85);border-radius:28px;padding:20px 20px 14px;box-shadow:0 20px 50px rgba(90,60,160,.18)}
+.hours{display:grid;grid-template-columns:120px repeat(13,1fr);font-size:12px;color:var(--muted);font-weight:700;margin-bottom:8px}.hours div{text-align:left}
+.row{display:grid;grid-template-columns:120px 1fr;align-items:center;margin-bottom:12px}
+.rn{font-weight:800;font-size:17px}.rn small{display:block;color:var(--muted);font-size:12px;font-weight:600}
+.track{position:relative;height:54px;border-radius:16px;background:repeating-linear-gradient(90deg,#f4f1ff 0,#f4f1ff calc(100%/13 - 1px),#e4defc calc(100%/13 - 1px),#e4defc calc(100%/13));}
+.blk{position:absolute;top:6px;bottom:6px;border-radius:12px;padding:6px 10px;color:#fff;font-weight:700;font-size:13px;overflow:hidden;white-space:nowrap}
+.o{background:linear-gradient(135deg,#ff9a3c,#ff6a00)}.p{background:linear-gradient(135deg,#ff6fa5,#ff2e7e)}.t{background:linear-gradient(135deg,#27d3c3,#0aa597)}.v{background:linear-gradient(135deg,#8f7bff,#5b3df0)}
+.now{position:absolute;top:-6px;bottom:-6px;width:3px;background:#e11d48;border-radius:3px}.now::before{content:"10:30";position:absolute;top:-18px;left:-16px;background:#e11d48;color:#fff;font-size:11px;font-weight:800;padding:1px 6px;border-radius:6px}
+.legend{display:flex;gap:18px;margin-top:6px;font-size:13px;color:var(--muted);font-weight:600}.legend span::before{content:"";display:inline-block;width:12px;height:12px;border-radius:4px;margin-right:6px;vertical-align:-1px}
+.l1::before{background:#ff6a00}.l2::before{background:#ff2e7e}.l3::before{background:#0aa597}.l4::before{background:#f4f1ff;border:1px solid #cfc7f6}
+</style></head><body><div class="wrap">
+<header><div class="logo">Room<i>Book</i></div><div class="ctl"><div class="date">‹ &nbsp;15 октября 2026&nbsp; ›</div><div class="new">+ Новая бронь</div></div></header>
+<section class="grid">
+<div class="hours"><div></div><div>08</div><div>09</div><div>10</div><div>11</div><div>12</div><div>13</div><div>14</div><div>15</div><div>16</div><div>17</div><div>18</div><div>19</div><div>20</div></div>
+<div class="row"><div class="rn">Байкал<small>этаж 3 · 8 мест</small></div><div class="track"><div class="blk p" style="left:15.4%;width:7.7%">Демо</div><div class="blk t" style="left:53.8%;width:15.4%">Ретро команды</div><div class="now" style="left:19.2%"></div></div></div>
+<div class="row"><div class="rn">Эльбрус<small>этаж 5 · 4 места</small></div><div class="track"><div class="blk o" style="left:15.4%;width:7.7%">Планёрка</div><div class="blk v" style="left:53.8%;width:7.7%">Интервью</div><div class="now" style="left:19.2%"></div></div></div>
+<div class="row"><div class="rn">Волга<small>этаж 2 · 12 мест</small></div><div class="track"><div class="blk v" style="left:38.5%;width:15.4%">Обучение</div><div class="blk o" style="left:76.9%;width:7.7%">Ретроспектива</div><div class="now" style="left:19.2%"></div></div></div>
+<div class="legend"><span class="l1">Встреча</span><span class="l2">Моя бронь</span><span class="l3">Команда</span><span class="l4">Свободно</span></div>
+</section></div></body></html>

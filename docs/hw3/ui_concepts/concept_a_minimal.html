@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RoomBook · Концепт A · Минимализм (карточки и форма)</title>
+<style>
+:root{--bg:#16171d;--panel:#1c1d25;--text:#9ca3af;--text-h:#f3f4f6;--border:#2e303a;--accent:#c084fc;--accent-bg:rgba(192,132,252,.15);--err:#f87171;--err-bg:rgba(239,68,68,.12);--ok:#4ade80;--ok-bg:rgba(34,197,94,.12)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,"Segoe UI",Roboto,sans-serif}
+.top{max-width:1100px;margin:0 auto;padding:20px 24px 0;display:flex;justify-content:space-between;align-items:center}
+.logo{font-weight:700;color:var(--text-h)}.logo i{color:var(--accent);font-style:normal}
+.user{font-size:14px;display:flex;gap:12px;align-items:center}.avatar{width:30px;height:30px;border-radius:50%;background:var(--accent-bg);color:var(--accent);display:grid;place-items:center;font-weight:600;font-size:13px}
+main{max-width:1100px;margin:0 auto;padding:8px 24px 48px}
+h1{font-size:38px;line-height:1.15;margin:14px 0 6px;color:var(--text-h);font-weight:500;letter-spacing:-.5px}
+.stats{font-size:15px;margin:0 0 20px}.stats b{color:var(--text-h);font-weight:500}
+.notice{color:var(--accent);font-size:15px;min-height:22px;margin:0 0 12px}
+.booking{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;align-items:start;margin-bottom:28px}
+.card{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:20px;box-shadow:0 10px 15px -3px rgba(0,0,0,.4)}
+.card h2{margin:0 0 14px;font-size:20px;font-weight:500;color:var(--text-h)}
+.f{display:flex;flex-direction:column;gap:6px;margin-bottom:12px;font-size:14px}.f .in{border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text-h);background:var(--panel);font-size:15px}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{background:var(--accent);color:#16171d;border-radius:8px;padding:11px;text-align:center;font-weight:600}
+.sched{display:flex;flex-direction:column;gap:10px}.slot{border-left:3px solid var(--accent);background:var(--accent-bg);border-radius:6px;padding:8px 12px}.slot small{display:block;color:var(--text);font-size:13px}.slot span{color:var(--text-h);font-weight:500}
+.rooms{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px}
+.room{display:flex;flex-direction:column;gap:14px}
+.room header{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.room h3{margin:0;font-size:20px;font-weight:500;color:var(--text-h)}
+.st{padding:2px 10px;border-radius:999px;font-size:13px;font-weight:500;white-space:nowrap}.st.free{color:var(--ok);background:var(--ok-bg)}.st.occ{color:var(--err);background:var(--err-bg)}
+dl{display:flex;gap:24px;margin:0}dt{font-size:12px}dd{margin:0;color:var(--text-h);font-size:16px}
+.tags{display:flex;gap:8px;flex-wrap:wrap}.tag{border:1px solid var(--accent-border,rgba(192,132,252,.5));color:var(--accent);background:var(--accent-bg);border-radius:6px;padding:2px 10px;font-size:13px}
+.book{background:var(--accent);color:#16171d;border-radius:8px;padding:11px;text-align:center;font-weight:600}
+@media(max-width:640px){h1{font-size:30px}main{padding:8px 16px 40px}.top{padding:14px 16px 0}.f2{grid-template-columns:1fr}.stats{font-size:14px}}
+</style></head><body>
+<div class="top"><div class="logo">Room<i>Book</i></div><div class="user"><span>alexey@example.com</span><div class="avatar">А</div></div></div>
+<main>
+<h1>Переговорные</h1>
+<p class="stats"><b>Всего: 3</b> · Свободно: 2 · Занято: 1</p>
+<p class="notice">Комната «Байкал» забронирована: 15.10.2026, 14:00–15:00</p>
+<div class="booking">
+ <section class="card"><h2>Новая бронь</h2>
+  <div class="f"><label>Комната</label><div class="in">Эльбрус</div></div>
+  <div class="f"><label>Название встречи</label><div class="in">Демо для заказчика</div></div>
+  <div class="f"><label>Дата</label><div class="in">15.10.2026</div></div>
+  <div class="f2"><div class="f"><label>Начало</label><div class="in">11:00</div></div><div class="f"><label>Конец</label><div class="in">12:00</div></div></div>
+  <div class="btn">Забронировать</div></section>
+ <section class="card"><h2>Расписание: Эльбрус</h2>
+  <div class="sched"><div class="slot"><small>15.10.2026, 10:00–11:00</small><span>Планёрка</span></div><div class="slot"><small>15.10.2026, 15:30–16:30</small><span>Собеседование</span></div></div></section>
+</div>
+<div class="rooms">
+ <article class="card room"><header><h3>Байкал</h3><span class="st free">Свободна</span></header><dl><div><dt>Этаж</dt><dd>3</dd></div><div><dt>Вместимость</dt><dd>8 человек</dd></div></dl><div class="tags"><span class="tag">Проектор</span><span class="tag">Доска</span><span class="tag">Видеосвязь</span></div><div class="book">Забронировать</div></article>
+ <article class="card room"><header><h3>Эльбрус</h3><span class="st occ">Занята до 11:00 · Планёрка</span></header><dl><div><dt>Этаж</dt><dd>5</dd></div><div><dt>Вместимость</dt><dd>4 человека</dd></div></dl><div class="tags"><span class="tag">Доска</span></div><div class="book">Забронировать</div></article>
+ <article class="card room"><header><h3>Волга</h3><span class="st free">Свободна</span></header><dl><div><dt>Этаж</dt><dd>2</dd></div><div><dt>Вместимость</dt><dd>12 человек</dd></div></dl><div class="tags"><span class="tag">Проектор</span><span class="tag">Видеосвязь</span></div><div class="book">Забронировать</div></article>
+</div></main></body></html>

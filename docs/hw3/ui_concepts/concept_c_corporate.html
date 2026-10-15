@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RoomBook · Концепт C · Корпоративный (меню и таблица)</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font:14px/1.45 "Segoe UI",Arial,sans-serif;color:#1f2937;background:#f1f3f6;display:flex;min-height:100vh}
+aside{width:230px;background:#10234a;color:#c8d3ea;padding:22px 0;flex-shrink:0}
+.brand{color:#fff;font-weight:700;font-size:18px;padding:0 22px 22px;border-bottom:1px solid rgba(255,255,255,.12)}
+nav{padding-top:14px}nav div{padding:10px 22px;display:flex;justify-content:space-between}nav .on{background:#1b3a7a;color:#fff;border-left:3px solid #5b9cff;padding-left:19px}nav b{background:rgba(255,255,255,.15);border-radius:10px;padding:0 8px;font-size:12px;font-weight:600}
+main{flex:1;padding:26px 32px}
+.head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}h1{margin:0;font-size:24px;color:#0f1d3d}
+.new{background:#1b5fd6;color:#fff;border-radius:4px;padding:9px 16px;font-weight:600}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}
+.kpi{background:#fff;border:1px solid #dde2ea;border-radius:6px;padding:16px 18px}.kpi small{color:#6b7280}.kpi div{font-size:30px;font-weight:700;color:#0f1d3d;margin-top:2px}.kpi .g{color:#15803d}.kpi .r{color:#b91c1c}
+table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #dde2ea;border-radius:6px;overflow:hidden}
+th{background:#eef2f8;text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:#475569;padding:10px 14px}td{padding:11px 14px;border-top:1px solid #e5e9f0}
+.pill{border-radius:10px;padding:2px 10px;font-size:12px;font-weight:600}.pill.n{background:#fee2e2;color:#b91c1c}.pill.s{background:#dcfce7;color:#15803d}.pill.f{background:#e0e7ff;color:#3730a3}
+.act{color:#1b5fd6;font-weight:600}
+h2{font-size:15px;margin:0 0 10px;color:#334155}
+</style></head><body>
+<aside><div class="brand">RoomBook</div><nav><div class="on">Комнаты <b>3</b></div><div>Мои брони <b>2</b></div><div>Календарь</div><div>Отчёты</div><div>Настройки</div></nav></aside>
+<main><div class="head"><h1>Комнаты</h1><div class="new">Новая бронь</div></div>
+<div class="kpis"><div class="kpi"><small>Всего комнат</small><div>3</div></div><div class="kpi"><small>Свободно сейчас</small><div class="g">2</div></div><div class="kpi"><small>Занято сейчас</small><div class="r">1</div></div></div>
+<h2>Ближайшие брони</h2>
+<table><tr><th>Комната</th><th>Название</th><th>Время</th><th>Статус</th><th>Действия</th></tr>
+<tr><td>Эльбрус</td><td>Планёрка</td><td>15.10.2026, 10:00–11:00</td><td><span class="pill n">Идёт сейчас</span></td><td class="act">Подробнее</td></tr>
+<tr><td>Байкал</td><td>Демо для заказчика</td><td>15.10.2026, 14:00–15:00</td><td><span class="pill f">Запланирована</span></td><td class="act">Перенести · Отменить</td></tr>
+<tr><td>Эльбрус</td><td>Собеседование</td><td>15.10.2026, 15:30–16:30</td><td><span class="pill f">Запланирована</span></td><td class="act">Перенести · Отменить</td></tr>
+<tr><td>Волга</td><td>Ретроспектива</td><td>15.10.2026, 18:00–19:00</td><td><span class="pill f">Запланирована</span></td><td class="act">Подробнее</td></tr>
+<tr><td>Байкал</td><td>Обучение</td><td>16.10.2026, 09:00–10:00</td><td><span class="pill s">Подтверждена</span></td><td class="act">Перенести · Отменить</td></tr>
+</table></main></body></html>
