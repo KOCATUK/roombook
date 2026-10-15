@@ -1,8 +1,11 @@
-import type { Equipment, Room } from '../types'
+import type { Booking, Equipment, Room } from '../types'
+import { formatTime } from '../utils/dateTime'
 import './RoomCard.css'
 
 interface RoomCardProps {
   room: Room
+  /** Бронь, идущая прямо сейчас; если её нет, комната свободна */
+  currentBooking?: Booking
   onBook?: (roomId: Room['id']) => void
 }
 
@@ -20,8 +23,9 @@ function formatCapacity(count: number): string {
   return `${count} ${form}`
 }
 
-export function RoomCard({ room, onBook }: RoomCardProps) {
-  const { id, name, floor, capacity, equipment, isOccupied } = room
+export function RoomCard({ room, currentBooking, onBook }: RoomCardProps) {
+  const { id, name, floor, capacity, equipment } = room
+  const isOccupied = currentBooking !== undefined
   const statusId = `room-card-status-${id}`
 
   return (
@@ -37,7 +41,9 @@ export function RoomCard({ room, onBook }: RoomCardProps) {
           className={`room-card__status room-card__status--${isOccupied ? 'occupied' : 'free'}`}
           id={statusId}
         >
-          {isOccupied ? 'Занята' : 'Свободна'}
+          {currentBooking
+            ? `Занята до ${formatTime(currentBooking.end)} · ${currentBooking.title}`
+            : 'Свободна'}
         </span>
       </header>
 
@@ -67,7 +73,7 @@ export function RoomCard({ room, onBook }: RoomCardProps) {
       <button
         className="room-card__button"
         type="button"
-        disabled={isOccupied}
+        // Не блокируем: занятую сейчас комнату можно забронировать на другое время
         aria-describedby={isOccupied ? statusId : undefined}
         onClick={() => onBook?.(id)}
       >

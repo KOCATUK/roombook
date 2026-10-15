@@ -7,8 +7,6 @@ export interface Room {
   /** Вместимость, человек */
   capacity: number
   equipment: Equipment[]
-  /** Комната занята прямо сейчас */
-  isOccupied: boolean
 }
 
 /** Локальное время без часового пояса: YYYY-MM-DDTHH:mm */
