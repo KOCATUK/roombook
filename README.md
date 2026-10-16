@@ -1,75 +1,84 @@
-# React + TypeScript + Vite
+# RoomBook
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Одностраничное веб-приложение для бронирования переговорных комнат: каталог комнат с текущим статусом, форма брони с проверкой пересечений и расписание комнаты с отменой брони. Сервера пока нет: данные отдаёт mock API в памяти браузера (`src/api/mockApi.ts`), поэтому после перезагрузки страницы брони сбрасываются к демо-данным.
 
-Currently, two official plugins are available:
+## Функции ДЗ4
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+1. **Каталог комнат и статус.** Карточки комнат (этаж, вместимость, оборудование) со статусом «Свободна» или «Занята до HH:mm» и названием текущей брони, сводка «Всего · Свободно · Занято». Состояния: загрузка (скелетон карточек), ошибка загрузки с кнопкой «Повторить», пустой список «Комнат пока нет».
+2. **Бронирование с валидацией.** Кнопка «Забронировать» на карточке открывает форму и переводит фокус в поле названия. Форма проверяет: название не пустое, дата и время корректны, конец позже начала, бронь в пределах одного дня, начало не в прошлом, нет пересечения с другой бронью этой комнаты. Интервал полуоткрытый `[начало, конец)`: бронь до 10:00 не пересекается с бронью с 10:00. При ошибке сохранения введённые данные не теряются, при успехе показывается уведомление.
+3. **Расписание комнаты и отмена брони.** Рядом с формой выводится расписание выбранной комнаты по времени. Отмена идёт с подтверждением «Отменить бронь?» и кнопками «Да» и «Нет»; есть состояния загрузки, ошибки, пустого расписания и ошибки отмены.
 
-## React Compiler
+## Стек
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Версии из `package.json`:
 
-## Expanding the ESLint configuration
+| Что | Пакет и версия |
+|---|---|
+| UI | `react` ^19.2.8, `react-dom` ^19.2.8 |
+| Язык | `typescript` ~6.0.2 (strict) |
+| Сборка | `vite` ^8.3.0, `@vitejs/plugin-react` ^6.1.1 |
+| Стили | `tailwindcss` ^4.3.3, `@tailwindcss/vite` ^4.3.3 |
+| Тесты | `vitest` ^5.0.5, `@testing-library/react` ^16.3.3, `@testing-library/user-event` ^14.6.8, `@testing-library/jest-dom` ^7.0.1, `jsdom` ^30.1.3 |
+| Линтер | `eslint` ^10.10.0, `typescript-eslint` ^8.69.0, `eslint-plugin-react-hooks` ^7.1.1, `eslint-plugin-react-refresh` ^0.5.6 |
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Роутера, стейт-менеджера и UI-библиотек компонентов нет: приложение состоит из одного экрана.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Требования
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- Node.js `^22.22.2`, `^24.15.0` или `>=26`. Это самое строгое из требований `engines` установленных пакетов (у `jsdom`); проект проверялся на Node.js 24.21.0.
+- npm (проверялся 11.19.0).
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Установка и запуск
 
+```sh
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Dev-сервер стартует на http://127.0.0.1:5173 (именно `127.0.0.1`, а не `localhost`) и открывает браузер. Порт фиксирован (`--strictPort`): если 5173 занят, сервер не запустится.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Сценарии mock API
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Сценарий выбирается параметром адреса, например http://127.0.0.1:5173/?scenario=slow. Без параметра или с неизвестным значением действует `ok`.
+
+| Сценарий | Что происходит |
+|---|---|
+| `ok` | Обычная работа: каждый запрос отвечает через 400–800 мс |
+| `slow` | Задержка 2,5–3,5 с, чтобы разглядеть скелетоны и заблокированные кнопки |
+| `error` | Загрузка комнат и расписания падает с ошибкой («Не удалось загрузить комнаты» / «Не удалось загрузить расписание»); видно состояние ошибки с кнопкой «Повторить» |
+| `saveError` | Загрузка работает, но создание брони («Не удалось сохранить бронь») и отмена («Не удалось отменить бронь») падают |
+| `empty` | Комнат и броней нет: каталог показывает «Комнат пока нет» |
+
+Демо-брони строятся от текущего времени: «Планёрка» в «Эльбрусе» занимает текущий час (поэтому одна комната всегда занята), «Ретроспектива» в «Волге» идёт с 18:00 до 19:00. При создании брони mock API повторно проверяет пересечение и при конфликте отвечает «Это время только что заняли. Выберите другое время».
+
+## Тесты и проверки
+
+```sh
+npm test        # Vitest + React Testing Library в jsdom, однократный прогон
+npm run lint    # ESLint
+npm run build   # проверка типов (tsc -b) и production-сборка Vite в dist/
+```
+
+Тесты лежат рядом с кодом (`*.test.ts`, `*.test.tsx`): проверка интервалов в `validateBooking`, конфликт в mock API, карточка комнаты, форма брони, отмена в расписании и сквозные сценарии в `App`.
+
+## Структура `src/`
 
 ```
+src/
+├── api/            mock API: getRooms, getBookings, createBooking, cancelBooking, ApiError
+├── components/     RoomCard, BookingForm, BookingList, общие классы Tailwind (classNames.ts)
+│   └── states/     LoadingState, ErrorState, EmptyState
+├── data/           демо-комнаты и демо-брони
+├── hooks/          useAsync (загрузка с состояниями), useNow (текущее время по минутам)
+├── utils/          валидация и поиск броней, работа с датой и временем, сводка по комнатам
+├── test/           настройка Vitest (jest-dom, cleanup)
+├── App.tsx         экран: каталог, форма и расписание
+├── types.ts        общие типы (Room, Booking, AsyncState и др.)
+└── index.css       Tailwind, цветовые токены светлой и тёмной темы, базовые стили
+```
+
+## Документация
+
+- [ТЗ на фронтенд ДЗ4](docs/hw4/frontend_spec.md)
+- [Отчёт о разработке ДЗ4](docs/hw4/development_report.md)
+- Скриншоты отладки, адаптивности и проверки рефакторинга: [docs/hw4/screens/](docs/hw4/screens/)
