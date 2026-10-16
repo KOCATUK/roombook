@@ -9,5 +9,11 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: ['src/test/setup.ts'],
+    // Vitest читает .env.local; обнуляем переменные, чтобы тесты всегда шли
+    // в mock API и никогда не ходили в сеть
+    env: {
+      VITE_SUPABASE_URL: '',
+      VITE_SUPABASE_ANON_KEY: '',
+    },
   },
 })
