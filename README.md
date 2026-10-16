@@ -80,5 +80,5 @@ src/
 ## Документация
 
 - [ТЗ на фронтенд ДЗ4](docs/hw4/frontend_spec.md)
-- [Отчёт о разработке ДЗ4](docs/hw4/development_report.md)
+- [Отчёт о разработке ДЗ4](development_report.md)
 - Скриншоты отладки, адаптивности и проверки рефакторинга: [docs/hw4/screens/](docs/hw4/screens/)
