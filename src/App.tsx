@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
-import { getBookings, getRooms } from './api/mockApi'
+import { createBooking, getBookings, getRooms } from './api/mockApi'
 import { BookingForm } from './components/BookingForm'
 import { BookingList } from './components/BookingList'
 import { RoomCard } from './components/RoomCard'
@@ -43,11 +43,14 @@ function App() {
     titleInputRef.current?.focus()
   }
 
-  function handleSubmit(draft: BookingDraft) {
-    setBookings((prev) => [...prev, { ...draft, id: crypto.randomUUID() }])
-    const roomName = rooms.find((room) => room.id === draft.roomId)?.name ?? ''
+  // Ошибку не ловим: её показывает форма, чтобы сохранить введённые данные
+  async function handleSubmit(draft: BookingDraft) {
+    setNotice('')
+    const booking = await createBooking(draft)
+    setBookings((prev) => [...prev, booking])
+    const roomName = rooms.find((room) => room.id === booking.roomId)?.name ?? ''
     setNotice(
-      `Комната «${roomName}» забронирована: ${formatDate(draft.start)}, ${formatTime(draft.start)}–${formatTime(draft.end)}`,
+      `Комната «${roomName}» забронирована: ${formatDate(booking.start)}, ${formatTime(booking.start)}–${formatTime(booking.end)}`,
     )
   }
 
