@@ -15,6 +15,10 @@ export type LocalDateTime = string
 export interface Booking {
   id: string
   roomId: Room['id']
+  /** id автора; есть только у броней из Supabase, в mock API автора нет */
+  userId?: string
+  /** Имя автора; приходит только вошедшему пользователю (гостю profiles недоступны) */
+  authorName?: string
   /** Название встречи */
   title: string
   /** Начало, включительно */
