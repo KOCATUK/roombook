@@ -211,7 +211,9 @@ async function runAuthChecks(token) {
 
   const overlap = await insertBooking(token, '2031-01-01T10:00:00Z', '2031-01-01T11:00:00Z')
   trackCreated(overlap)
-  expectError('8. POST bookings тот же интервал', overlap, '23P01', 409)
+  // 400, а не 409: так PostgREST ответил на 23P01 во всех наблюдениях
+  // (логи API Gateway и Postgres, DevTools Network), см. docs/hw5/log_analysis.md
+  expectError('8. POST bookings тот же интервал', overlap, '23P01', 400)
 
   const adjacent = await insertBooking(token, '2031-01-01T11:00:00Z', '2031-01-01T12:00:00Z')
   trackCreated(adjacent)

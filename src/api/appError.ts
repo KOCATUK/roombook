@@ -73,7 +73,8 @@ function readNumberField(value: object, key: string): number | undefined {
 }
 
 function getKind(code: string | undefined, status: number | undefined, isFetchError: boolean): AppErrorKind {
-  // Конфликт проверяем до статусов: PostgREST отдаёт его с 409
+  // Конфликт определяем по коду 23P01 до проверки статусов: на практике
+  // PostgREST отдавал его с 400, и по статусу он попал бы в validation
   if (code === POSTGRES_EXCLUSION_VIOLATION) {
     return 'conflict'
   }
