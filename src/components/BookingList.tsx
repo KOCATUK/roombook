@@ -32,7 +32,7 @@ const TOUCH_CLASS_NAME = 'pointer-coarse:min-h-11 pointer-coarse:px-4'
 
 const SECONDARY_BUTTON_CLASS_NAME = `cursor-pointer rounded-md border border-(--accent-border) px-2.5 py-1 text-[13px] text-(--accent) enabled:hover:bg-(--accent-bg) disabled:cursor-not-allowed disabled:opacity-60 ${TOUCH_CLASS_NAME} ${FOCUS_RING_CLASS_NAME}`
 
-const PRIMARY_BUTTON_CLASS_NAME = `cursor-pointer rounded-md bg-(--accent) px-2.5 py-1 text-[13px] font-medium text-white enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60 dark:text-[#16171d] ${TOUCH_CLASS_NAME} ${FOCUS_RING_CLASS_NAME}`
+const PRIMARY_BUTTON_CLASS_NAME = `cursor-pointer rounded-md bg-(--accent) px-2.5 py-1 text-[13px] font-medium text-(--on-accent) enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60 ${TOUCH_CLASS_NAME} ${FOCUS_RING_CLASS_NAME}`
 
 function BookingListItem({ booking, onCancel }: BookingListItemProps) {
   const [step, setStep] = useState<CancelStep>('idle')
@@ -113,7 +113,7 @@ function BookingListItem({ booking, onCancel }: BookingListItemProps) {
           <>
             <span
               role="alert"
-              className="text-[13px] text-[#b91c1c] dark:text-[#f87171]"
+              className="text-[13px] text-(--danger)"
             >
               Не удалось отменить бронь
             </span>

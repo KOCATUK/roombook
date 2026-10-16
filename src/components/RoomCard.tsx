@@ -23,10 +23,10 @@ const STATUS_CLASS_NAME =
   'shrink-0 rounded-full px-2.5 py-0.5 text-[13px] font-medium whitespace-nowrap'
 
 const FREE_STATUS_CLASS_NAME =
-  'bg-[rgba(34,197,94,0.12)] text-[#15803d] dark:text-[#4ade80]'
+  'bg-(--success-bg) text-(--success)'
 
 const OCCUPIED_STATUS_CLASS_NAME =
-  'bg-[rgba(239,68,68,0.12)] text-[#b91c1c] dark:text-[#f87171]'
+  'bg-(--danger-bg) text-(--danger)'
 
 const pluralRules = new Intl.PluralRules('ru-RU')
 

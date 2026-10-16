@@ -45,7 +45,7 @@ const DATE_ERRORS: BookingErrorCode[] = ['invalidDateTime', 'startInPast']
 
 const SAVE_ERROR_MESSAGE = 'Не удалось сохранить бронь'
 
-const CONTROL_CLASS_NAME = `min-h-11 w-full rounded-lg border border-(--border) bg-(--bg) px-2.5 py-2 text-(--text-h) disabled:cursor-not-allowed disabled:opacity-60 aria-invalid:border-(--booking-form-error) ${FOCUS_RING_CLASS_NAME}`
+const CONTROL_CLASS_NAME = `min-h-11 w-full rounded-lg border border-(--border) bg-(--bg) px-2.5 py-2 text-(--text-h) disabled:cursor-not-allowed disabled:opacity-60 aria-invalid:border-(--danger) ${FOCUS_RING_CLASS_NAME}`
 
 const FIELD_CLASS_NAME = 'flex min-w-0 flex-col gap-1'
 
@@ -139,8 +139,7 @@ export function BookingForm({
       )}
 
       <form
-        // В общей палитре нет цвета ошибки, поэтому он объявлен на уровне компонента
-        className={`flex flex-col gap-4 p-5 ${PANEL_CLASS_NAME} [--booking-form-error:#b91c1c] dark:[--booking-form-error:#f87171]`}
+        className={`flex flex-col gap-4 p-5 ${PANEL_CLASS_NAME}`}
         aria-labelledby={headingId}
         aria-busy={isSubmitting}
         // Встроенная проверка браузера показывает свои подсказки и не знает о пересечениях,
@@ -250,7 +249,7 @@ export function BookingForm({
 
         {hasErrors && (
           <ul
-            className="flex list-disc flex-col gap-1 rounded-lg bg-[rgba(239,68,68,0.12)] py-2.5 pr-3 pl-7 text-[14px] text-(--booking-form-error)"
+            className="flex list-disc flex-col gap-1 rounded-lg bg-(--danger-bg) py-2.5 pr-3 pl-7 text-[14px] text-(--danger)"
             id={errorsId}
             role="alert"
           >
