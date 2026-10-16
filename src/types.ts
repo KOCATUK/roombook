@@ -36,3 +36,9 @@ export type BookingErrorCode =
 export type BookingValidationResult =
   | { ok: true }
   | { ok: false; errors: BookingErrorCode[]; conflict?: Booking }
+
+export type AsyncState<T> =
+  | { status: 'idle' }
+  | { status: 'loading' }
+  | { status: 'success'; data: T }
+  | { status: 'error'; message: string }
