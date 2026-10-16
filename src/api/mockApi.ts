@@ -1,12 +1,12 @@
 import { createInitialBookings } from '../data/initialBookings'
 import { ROOMS } from '../data/rooms'
 import type { Booking, BookingDraft, BookingErrorCode, Room } from '../types'
-import { getRoomBookings, validateBooking } from '../utils/bookings'
+import { validateBooking } from '../utils/bookings'
 import { toLocalDateTime } from '../utils/dateTime'
 
 const SCENARIOS = ['ok', 'slow', 'error', 'saveError', 'empty'] as const
 
-export type Scenario = (typeof SCENARIOS)[number]
+type Scenario = (typeof SCENARIOS)[number]
 
 export type ApiErrorCode = 'loadFailed' | 'saveFailed' | 'conflict' | 'invalid' | 'notFound'
 
@@ -38,7 +38,7 @@ function isScenario(value: string | null): value is Scenario {
 
 // Читаем адрес при каждом вызове, а не один раз при загрузке модуля,
 // чтобы тесты могли менять сценарий через history.replaceState
-export function getScenario(): Scenario {
+function getScenario(): Scenario {
   const value = new URLSearchParams(window.location.search).get('scenario')
   return isScenario(value) ? value : DEFAULT_SCENARIO
 }
@@ -78,8 +78,7 @@ export async function getRooms(): Promise<Room[]> {
   return ROOMS.map((room) => ({ ...room, equipment: [...room.equipment] }))
 }
 
-/** Без roomId возвращает все брони, с roomId — расписание комнаты по времени */
-export async function getBookings(roomId?: Room['id']): Promise<Booking[]> {
+export async function getBookings(): Promise<Booking[]> {
   const scenario = await startRequest()
 
   if (scenario === 'error') {
@@ -88,8 +87,7 @@ export async function getBookings(roomId?: Room['id']): Promise<Booking[]> {
   if (scenario === 'empty') {
     return []
   }
-  const bookings = roomId ? getRoomBookings(roomId, bookingsStore) : bookingsStore
-  return bookings.map(cloneBooking)
+  return bookingsStore.map(cloneBooking)
 }
 
 export async function createBooking(draft: BookingDraft): Promise<Booking> {

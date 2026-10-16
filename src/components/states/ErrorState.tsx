@@ -3,10 +3,9 @@ import { PRIMARY_BUTTON_CLASS_NAME } from '../classNames'
 interface ErrorStateProps {
   message: string
   onRetry: () => void
-  retryLabel?: string
 }
 
-export function ErrorState({ message, onRetry, retryLabel = 'Повторить' }: ErrorStateProps) {
+export function ErrorState({ message, onRetry }: ErrorStateProps) {
   return (
     <div
       role="alert"
@@ -14,7 +13,7 @@ export function ErrorState({ message, onRetry, retryLabel = 'Повторить'
     >
       <p>{message}</p>
       <button type="button" onClick={onRetry} className={PRIMARY_BUTTON_CLASS_NAME}>
-        {retryLabel}
+        Повторить
       </button>
     </div>
   )

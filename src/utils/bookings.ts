@@ -14,11 +14,11 @@ type TimeRange = Pick<Booking, 'start' | 'end'>
 // так же, как хронологически, поэтому здесь не нужен Date и нет риска сдвига на часовой пояс
 
 /** Полуоткрытые интервалы: бронь до 10:00 не пересекается с бронью с 10:00 */
-export function isOverlapping(a: TimeRange, b: TimeRange): boolean {
+function isOverlapping(a: TimeRange, b: TimeRange): boolean {
   return a.start < b.end && b.start < a.end
 }
 
-export function findConflict(
+function findConflict(
   draft: BookingDraft,
   bookings: Booking[],
 ): Booking | undefined {
