@@ -32,6 +32,8 @@ function App() {
 
   const loadedBookings =
     bookingsState.status === 'success' ? bookingsState.data : null
+  // Обновляем во время рендера, а не в эффекте (как в useAsync): иначе один кадр
+  // после загрузки показал бы устаревшие брони
   if (loadedBookings && loadedBookings !== lastBookings) {
     setLastBookings(loadedBookings)
   }

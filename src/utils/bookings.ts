@@ -84,5 +84,6 @@ export function getRoomBookings(
 ): Booking[] {
   return bookings
     .filter((booking) => booking.roomId === roomId)
+    // Сравниваем строки операторами, а не localeCompare: порядок не должен зависеть от локали
     .sort((a, b) => (a.start < b.start ? -1 : a.start > b.start ? 1 : 0))
 }

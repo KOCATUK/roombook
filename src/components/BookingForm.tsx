@@ -33,6 +33,8 @@ interface BookingFormProps {
 
 const TITLE_MAX_LENGTH = 100
 
+// invalidDateTime входит в оба списка: по коду ошибки не понять, какое поле неверно,
+// поэтому подсвечиваем и дату, и время
 const TIME_ERRORS: BookingErrorCode[] = [
   'invalidDateTime',
   'endNotAfterStart',
