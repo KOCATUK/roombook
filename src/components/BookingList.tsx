@@ -1,5 +1,6 @@
 import { useId, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
+import { AppError } from '../api/appError'
 import type { AsyncState, Booking, Room } from '../types'
 import { getRoomBookings } from '../utils/bookings'
 import { formatDate, formatTime } from '../utils/dateTime'
@@ -17,11 +18,14 @@ interface BookingListProps {
   onRetry: () => void
   /** Отклоняется, если бронь не удалось отменить */
   onCancel: (booking: Booking) => Promise<void>
+  /** Можно ли отменить бронь; по умолчанию можно любую, как в mock API без входа */
+  canCancel?: (booking: Booking) => boolean
 }
 
 interface BookingListItemProps {
   booking: Booking
   onCancel: (booking: Booking) => Promise<void>
+  canCancel: boolean
 }
 
 type CancelStep = 'idle' | 'confirming' | 'cancelling' | 'error'
@@ -34,8 +38,15 @@ const SECONDARY_BUTTON_CLASS_NAME = `cursor-pointer rounded-md border border-(--
 
 const PRIMARY_BUTTON_CLASS_NAME = `cursor-pointer rounded-md bg-(--accent) px-2.5 py-1 text-[13px] font-medium text-(--on-accent) enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60 ${TOUCH_CLASS_NAME} ${FOCUS_RING_CLASS_NAME}`
 
-function BookingListItem({ booking, onCancel }: BookingListItemProps) {
+const CANCEL_ERROR_MESSAGE = 'Не удалось отменить бронь'
+
+function canCancelAny(): boolean {
+  return true
+}
+
+function BookingListItem({ booking, onCancel, canCancel }: BookingListItemProps) {
   const [step, setStep] = useState<CancelStep>('idle')
+  const [errorMessage, setErrorMessage] = useState(CANCEL_ERROR_MESSAGE)
   const cancelButtonRef = useRef<HTMLButtonElement>(null)
   const noButtonRef = useRef<HTMLButtonElement>(null)
   const isCancelling = step === 'cancelling'
@@ -57,7 +68,9 @@ function BookingListItem({ booking, onCancel }: BookingListItemProps) {
     try {
       // При успехе строка исчезнет после перезагрузки расписания
       await onCancel(booking)
-    } catch {
+    } catch (error: unknown) {
+      // У AppError сообщение объясняет причину: нет сети, чужая бронь, истекла сессия
+      setErrorMessage(error instanceof AppError ? error.message : CANCEL_ERROR_MESSAGE)
       setStep('error')
     }
   }
@@ -72,61 +85,66 @@ function BookingListItem({ booking, onCancel }: BookingListItemProps) {
       <span className="font-medium wrap-anywhere text-(--text-h)">
         {booking.title}
       </span>
+      {booking.authorName && (
+        <span className="text-[13px] wrap-anywhere">Автор: {booking.authorName}</span>
+      )}
 
-      <div className="mt-1.5 flex flex-wrap items-center gap-2 pointer-coarse:gap-3">
-        {step === 'idle' && (
-          <button
-            ref={cancelButtonRef}
-            type="button"
-            className={SECONDARY_BUTTON_CLASS_NAME}
-            aria-label={`Отменить бронь «${booking.title}»`}
-            onClick={handleAskConfirm}
-          >
-            Отменить
-          </button>
-        )}
-
-        {(step === 'confirming' || isCancelling) && (
-          <>
-            <span className="text-[13px] text-(--text-h)">Отменить бронь?</span>
+      {canCancel && (
+        <div className="mt-1.5 flex flex-wrap items-center gap-2 pointer-coarse:gap-3">
+          {step === 'idle' && (
             <button
-              type="button"
-              className={PRIMARY_BUTTON_CLASS_NAME}
-              disabled={isCancelling}
-              onClick={() => void handleConfirm()}
-            >
-              {isCancelling ? 'Отменяем…' : 'Да'}
-            </button>
-            <button
-              ref={noButtonRef}
+              ref={cancelButtonRef}
               type="button"
               className={SECONDARY_BUTTON_CLASS_NAME}
-              disabled={isCancelling}
-              onClick={handleDecline}
+              aria-label={`Отменить бронь «${booking.title}»`}
+              onClick={handleAskConfirm}
             >
-              Нет
+              Отменить
             </button>
-          </>
-        )}
+          )}
 
-        {step === 'error' && (
-          <>
-            <span
-              role="alert"
-              className="text-[13px] text-(--danger)"
-            >
-              Не удалось отменить бронь
-            </span>
-            <button
-              type="button"
-              className={SECONDARY_BUTTON_CLASS_NAME}
-              onClick={() => void handleConfirm()}
-            >
-              Повторить
-            </button>
-          </>
-        )}
-      </div>
+          {(step === 'confirming' || isCancelling) && (
+            <>
+              <span className="text-[13px] text-(--text-h)">Отменить бронь?</span>
+              <button
+                type="button"
+                className={PRIMARY_BUTTON_CLASS_NAME}
+                disabled={isCancelling}
+                onClick={() => void handleConfirm()}
+              >
+                {isCancelling ? 'Отменяем…' : 'Да'}
+              </button>
+              <button
+                ref={noButtonRef}
+                type="button"
+                className={SECONDARY_BUTTON_CLASS_NAME}
+                disabled={isCancelling}
+                onClick={handleDecline}
+              >
+                Нет
+              </button>
+            </>
+          )}
+
+          {step === 'error' && (
+            <>
+              <span
+                role="alert"
+                className="text-[13px] text-(--danger)"
+              >
+                {errorMessage}
+              </span>
+              <button
+                type="button"
+                className={SECONDARY_BUTTON_CLASS_NAME}
+                onClick={() => void handleConfirm()}
+              >
+                Повторить
+              </button>
+            </>
+          )}
+        </div>
+      )}
     </li>
   )
 }
@@ -136,6 +154,7 @@ export function BookingList({
   bookingsState,
   onRetry,
   onCancel,
+  canCancel = canCancelAny,
 }: BookingListProps) {
   const headingId = useId()
 
@@ -158,7 +177,12 @@ export function BookingList({
     return (
       <ul className="flex flex-col gap-2">
         {roomBookings.map((booking) => (
-          <BookingListItem key={booking.id} booking={booking} onCancel={onCancel} />
+          <BookingListItem
+            key={booking.id}
+            booking={booking}
+            onCancel={onCancel}
+            canCancel={canCancel(booking)}
+          />
         ))}
       </ul>
     )

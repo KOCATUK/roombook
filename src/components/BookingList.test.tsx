@@ -51,4 +51,24 @@ describe('BookingList', () => {
     expect(await screen.findByText('Броней пока нет')).toBeInTheDocument()
     expect(screen.queryByText('Планёрка')).not.toBeInTheDocument()
   })
+
+  it('у чужой брони показывает автора и не показывает «Отменить»', () => {
+    render(
+      <BookingList
+        room={ROOM}
+        bookingsState={{
+          status: 'success',
+          data: [{ ...BOOKING, userId: 'other', authorName: 'Анна' }],
+        }}
+        onRetry={() => {}}
+        onCancel={async () => {}}
+        canCancel={(booking) => booking.userId === 'me'}
+      />,
+    )
+
+    expect(screen.getByText('Автор: Анна')).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'Отменить бронь «Планёрка»' }),
+    ).not.toBeInTheDocument()
+  })
 })

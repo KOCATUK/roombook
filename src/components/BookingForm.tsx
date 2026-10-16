@@ -1,5 +1,6 @@
 import { useId, useState } from 'react'
 import type { Ref } from 'react'
+import { AppError } from '../api/appError'
 import { ApiError } from '../api/mockApi'
 import type {
   Booking,
@@ -25,7 +26,7 @@ interface BookingFormProps {
   now: LocalDateTime
   roomId: Room['id']
   onRoomChange: (roomId: Room['id']) => void
-  /** Отклоняется с ApiError, если бронь не сохранилась */
+  /** Отклоняется с ApiError (mock) или AppError (Supabase), если бронь не сохранилась */
   onSubmit: (draft: BookingDraft) => Promise<void>
   /** Позволяет родителю перевести фокус в форму после выбора комнаты */
   titleInputRef?: Ref<HTMLInputElement>
@@ -76,7 +77,7 @@ export function BookingForm({
   // Конфликт, найденный сервером: локальный список броней мог устареть
   const [serverConflictMessage, setServerConflictMessage] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [hasSaveError, setHasSaveError] = useState(false)
+  const [saveErrorMessage, setSaveErrorMessage] = useState('')
 
   const hasAnyError = (codes: BookingErrorCode[]) =>
     codes.some((code) => errors.includes(code))
@@ -103,7 +104,7 @@ export function BookingForm({
     const result = validateBooking(draft, bookings, now)
 
     setServerConflictMessage('')
-    setHasSaveError(false)
+    setSaveErrorMessage('')
 
     if (!result.ok) {
       setErrors(result.errors)
@@ -122,12 +123,16 @@ export function BookingForm({
       setEndTime('')
     } catch (error: unknown) {
       // Поля не очищаем ни при какой ошибке, чтобы пользователь не вводил всё заново (FR-40)
-      if (error instanceof ApiError && error.code === 'conflict') {
+      const isConflict =
+        (error instanceof ApiError && error.code === 'conflict') ||
+        (error instanceof AppError && error.kind === 'conflict')
+      if (isConflict) {
         setServerConflictMessage(error.message)
       } else if (error instanceof ApiError && error.code === 'invalid') {
         setErrors(error.validationErrors)
       } else {
-        setHasSaveError(true)
+        // У AppError сообщение уже объясняет причину (нет сети, истекла сессия)
+        setSaveErrorMessage(error instanceof AppError ? error.message : SAVE_ERROR_MESSAGE)
       }
     } finally {
       setIsSubmitting(false)
@@ -136,8 +141,8 @@ export function BookingForm({
 
   return (
     <div className="flex flex-col gap-4">
-      {hasSaveError && (
-        <ErrorState message={SAVE_ERROR_MESSAGE} onRetry={handleSubmit} />
+      {saveErrorMessage !== '' && (
+        <ErrorState message={saveErrorMessage} onRetry={handleSubmit} />
       )}
 
       <form
