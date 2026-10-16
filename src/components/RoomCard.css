@@ -52,6 +52,20 @@
   background: rgba(239, 68, 68, 0.12);
 }
 
+/* Обрезаем на двух строках, чтобы длинное название не раздувало карточку в ряду;
+   полный текст остаётся в DOM для скринридеров и в title для мыши */
+.room-card__booking {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  color: var(--text-h);
+}
+
 .room-card__details {
   display: flex;
   gap: 24px;

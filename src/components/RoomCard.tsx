@@ -27,6 +27,7 @@ export function RoomCard({ room, currentBooking, onBook }: RoomCardProps) {
   const { id, name, floor, capacity, equipment } = room
   const isOccupied = currentBooking !== undefined
   const statusId = `room-card-status-${id}`
+  const bookingId = `room-card-booking-${id}`
 
   return (
     <article
@@ -41,11 +42,17 @@ export function RoomCard({ room, currentBooking, onBook }: RoomCardProps) {
           className={`room-card__status room-card__status--${isOccupied ? 'occupied' : 'free'}`}
           id={statusId}
         >
-          {currentBooking
-            ? `Занята до ${formatTime(currentBooking.end)} · ${currentBooking.title}`
-            : 'Свободна'}
+          {currentBooking ? `Занята до ${formatTime(currentBooking.end)}` : 'Свободна'}
         </span>
       </header>
+
+      {currentBooking && (
+        // Название брони приходит из данных и может быть любой длины, поэтому оно
+        // вынесено из бейджа: бейдж не переносится и вылезал бы за край карточки
+        <p className="room-card__booking" id={bookingId} title={currentBooking.title}>
+          {currentBooking.title}
+        </p>
+      )}
 
       <dl className="room-card__details">
         <div className="room-card__detail">
@@ -74,7 +81,7 @@ export function RoomCard({ room, currentBooking, onBook }: RoomCardProps) {
         className="room-card__button"
         type="button"
         // Не блокируем: занятую сейчас комнату можно забронировать на другое время
-        aria-describedby={isOccupied ? statusId : undefined}
+        aria-describedby={isOccupied ? `${statusId} ${bookingId}` : undefined}
         onClick={() => onBook?.(id)}
       >
         Забронировать
