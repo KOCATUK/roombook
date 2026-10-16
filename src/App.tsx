@@ -1,6 +1,11 @@
 import { useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
-import { createBooking, getBookings, getRooms } from './api/mockApi'
+import {
+  cancelBooking,
+  createBooking,
+  getBookings,
+  getRooms,
+} from './api/mockApi'
 import { BookingForm } from './components/BookingForm'
 import { BookingList } from './components/BookingList'
 import { RoomCard } from './components/RoomCard'
@@ -18,21 +23,20 @@ function App() {
   const now = useNow()
   const { state: roomsState, reload: reloadRooms } = useAsync(getRooms)
   const { state: bookingsState, reload: reloadBookings } = useAsync(getBookings)
-  const [bookings, setBookings] = useState<Booking[]>([])
-  const [syncedBookings, setSyncedBookings] = useState<Booking[] | null>(null)
+  // Последние успешно загруженные брони: пока после создания или отмены идёт перезагрузка,
+  // каталог и проверка формы работают по ним, а не мигают скелетоном
+  const [lastBookings, setLastBookings] = useState<Booking[] | null>(null)
   const [selectedRoomId, setSelectedRoomId] = useState<Room['id'] | null>(null)
   const [notice, setNotice] = useState('')
   const titleInputRef = useRef<HTMLInputElement>(null)
 
-  // Новые брони пока добавляются только локально, поэтому локальный список
-  // перезаписываем лишь когда с API пришли новые данные (первая загрузка или «Повторить»)
   const loadedBookings =
     bookingsState.status === 'success' ? bookingsState.data : null
-  if (loadedBookings && loadedBookings !== syncedBookings) {
-    setSyncedBookings(loadedBookings)
-    setBookings(loadedBookings)
+  if (loadedBookings && loadedBookings !== lastBookings) {
+    setLastBookings(loadedBookings)
   }
 
+  const bookings = loadedBookings ?? lastBookings ?? []
   const rooms = roomsState.status === 'success' ? roomsState.data : []
   const selectedRoom = rooms.find((room) => room.id === selectedRoomId)
 
@@ -47,11 +51,19 @@ function App() {
   async function handleSubmit(draft: BookingDraft) {
     setNotice('')
     const booking = await createBooking(draft)
-    setBookings((prev) => [...prev, booking])
+    reloadBookings()
     const roomName = rooms.find((room) => room.id === booking.roomId)?.name ?? ''
     setNotice(
       `Комната «${roomName}» забронирована: ${formatDate(booking.start)}, ${formatTime(booking.start)}–${formatTime(booking.end)}`,
     )
+  }
+
+  // Ошибку не ловим: её показывает строка расписания
+  async function handleCancel(booking: Booking) {
+    setNotice('')
+    await cancelBooking(booking.id)
+    reloadBookings()
+    setNotice(`Бронь «${booking.title}» отменена`)
   }
 
   // Повторяем только упавшие запросы, чтобы не сбрасывать уже загруженное
@@ -65,7 +77,11 @@ function App() {
   }
 
   function renderRooms() {
-    if (roomsState.status === 'error' || bookingsState.status === 'error') {
+    // Если брони уже загружались, ошибку перезагрузки показывает расписание,
+    // а каталог остаётся с последними данными
+    const isBookingsFailed =
+      bookingsState.status === 'error' && lastBookings === null
+    if (roomsState.status === 'error' || isBookingsFailed) {
       const message =
         roomsState.status === 'error'
           ? roomsState.message
@@ -76,7 +92,7 @@ function App() {
     }
 
     // Без броней статус комнат неизвестен, поэтому ждём оба запроса
-    if (roomsState.status !== 'success' || bookingsState.status !== 'success') {
+    if (roomsState.status !== 'success' || lastBookings === null) {
       return <LoadingState label="Загрузка комнат…" />
     }
 
@@ -121,7 +137,12 @@ function App() {
             onSubmit={handleSubmit}
             titleInputRef={titleInputRef}
           />
-          <BookingList room={selectedRoom} bookings={bookings} />
+          <BookingList
+            room={selectedRoom}
+            bookingsState={bookingsState}
+            onRetry={reloadBookings}
+            onCancel={handleCancel}
+          />
         </div>
       )}
 
