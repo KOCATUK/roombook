@@ -12,7 +12,6 @@
     rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
 
   --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
 
   font: 16px/145% var(--sans);
   color-scheme: light dark;
@@ -38,33 +37,30 @@
   }
 }
 
-body {
-  margin: 0;
-  min-height: 100svh;
-}
-
-h1,
-h2,
-h3 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
-}
-
-h1 {
-  font-size: 36px;
-  line-height: 1.2;
-  letter-spacing: -0.5px;
-}
-
-/* Медиазапрос, а не утилита text-*: это правило вне слоёв Tailwind и перебило бы её.
-   40rem совпадает с брейкпоинтом sm, на котором каталог переходит в две колонки */
-@media (width < 40rem) {
-  h1 {
-    font-size: 28px;
+/* Стили элементов в слое base, а не вне слоёв: иначе они перебивают утилиты Tailwind.
+   Отступы p и body уже обнуляет preflight */
+@layer base {
+  body {
+    min-height: 100svh;
   }
-}
 
-p {
-  margin: 0;
+  h1,
+  h2,
+  h3 {
+    font-weight: 500;
+    color: var(--text-h);
+  }
+
+  h1 {
+    font-size: 36px;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+  }
+
+  /* 40rem совпадает с брейкпоинтом sm, на котором каталог переходит в две колонки */
+  @media (width < 40rem) {
+    h1 {
+      font-size: 28px;
+    }
+  }
 }

@@ -121,7 +121,6 @@ function App() {
     <main className="mx-auto max-w-[1126px] px-4 py-8">
       <h1 className="mb-1">Переговорные</h1>
 
-      {/* div, а не p: правило p { margin: 0 } в index.css вне слоёв и перебивает утилиты отступов */}
       <div className="mb-3 min-h-[1.45em] text-(--accent) sm:mb-4" role="status">
         {notice}
       </div>
