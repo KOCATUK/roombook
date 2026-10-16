@@ -1,0 +1,89 @@
+Supabase: https://unujoliagstdbkonilfd.supabase.co
+
+— Без входа (anon) —
+[PASS] 1. GET rooms
+       ожидалось: — / HTTP 200
+       получено:  — / HTTP 200
+       комнаты: baikal,elbrus,volga
+       sb-request-id: 01a146dd-2f1b-7bb4-af91-a633a02be564
+[PASS] 2. GET bookings
+       ожидалось: — / HTTP 200
+       получено:  — / HTTP 200
+       строк (limit 5): 1
+       sb-request-id: 01a146dd-2fe5-7bbd-9f80-c193e8f35f6c
+[PASS] 3. GET profiles без входа
+       ожидалось: 42501 / HTTP 401
+       получено:  42501 / HTTP 401
+       сообщение: permission denied for table profiles
+       sb-request-id: 01a146dd-3126-795e-a4e8-d37f8c1267f9
+[PASS] 4. POST bookings без входа
+       ожидалось: 42501 / HTTP 401
+       получено:  42501 / HTTP 401
+       сообщение: permission denied for table bookings
+       sb-request-id: 01a146dd-31b5-7405-9a98-863307c355ff
+[INFO] 5. CORS preflight, Origin http://127.0.0.1:5173
+       HTTP 200
+       access-control-allow-headers: apikey,authorization,content-type,prefer
+       access-control-allow-methods: GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS,TRACE,CONNECT
+       access-control-allow-origin: *
+       sb-request-id: 01a146dd-3252-7fc2-81ad-00045375506f
+[INFO] 5. CORS preflight, Origin http://evil.example
+       HTTP 200
+       access-control-allow-headers: apikey,authorization,content-type,prefer
+       access-control-allow-methods: GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS,TRACE,CONNECT
+       access-control-allow-origin: *
+       sb-request-id: 01a146dd-32a2-7f2b-b976-968447564f1b
+
+— Со входом (ACCESS_TOKEN) —
+[PASS] 6. POST rooms
+       ожидалось: 42501 / HTTP 403
+       получено:  42501 / HTTP 403
+       сообщение: permission denied for table rooms
+       sb-request-id: 01a146dd-3300-7220-a356-9b8d15e3a9f2
+[PASS] 7. POST bookings volga 10:00–11:00 UTC
+       ожидалось: — / HTTP 201
+       получено:  — / HTTP 201
+       id: 09925637-b63c-4d3b-a509-f626299a325f
+       sb-request-id: 01a146dd-3374-7b31-a43c-a742255a070e
+[WARN] 8. POST bookings тот же интервал
+       ожидалось: 23P01 / HTTP 409
+       получено:  23P01 / HTTP 400
+       сообщение: conflicting key value violates exclusion constraint "bookings_no_overlap"
+       sb-request-id: 01a146dd-3400-793e-8b67-8f84b6abf420
+[PASS] 9. POST bookings встык 11:00–12:00 UTC
+       ожидалось: — / HTTP 201
+       получено:  — / HTTP 201
+       id: 538ac077-927b-4137-bda1-d85d2aa9d67e
+       sb-request-id: 01a146dd-3477-72c0-b77b-66496a48c165
+[PASS] 10. POST bookings ends_at = starts_at
+       ожидалось: 23514 / HTTP 400
+       получено:  23514 / HTTP 400
+       сообщение: new row for relation "bookings" violates check constraint "bookings_ends_after_starts"
+       sb-request-id: 01a146dd-3500-72b0-a96f-5813571d9289
+[PASS] 11. POST bookings с чужим user_id
+       ожидалось: 42501 / HTTP 403
+       получено:  42501 / HTTP 403
+       сообщение: new row violates row-level security policy for table "bookings"
+       sb-request-id: 01a146dd-356a-7d35-8299-58ac21f1f205
+[PASS] 12. PATCH title своей брони
+       ожидалось: — / HTTP 200
+       получено:  — / HTTP 200
+       строк изменено: 1, title применён: да
+       sb-request-id: 01a146dd-35cc-7da9-b233-355ab9f14f82
+[PASS] 13. PATCH user_id своей брони
+       ожидалось: 42501 / HTTP 403
+       получено:  42501 / HTTP 403
+       сообщение: permission denied for table bookings
+       sb-request-id: 01a146dd-3634-778f-9e23-3b4c085547fb
+[PASS] 14. GET bookings с profiles(display_name)
+       ожидалось: — / HTTP 200
+       получено:  — / HTTP 200
+       строк: 2, с display_name: 2
+       sb-request-id: 01a146dd-36bf-77ea-a09e-a1b21638b4ca
+[PASS] 15. DELETE своих тестовых броней
+       ожидалось: — / HTTP 200
+       получено:  — / HTTP 200
+       удалено строк: 2 из 2
+       sb-request-id: 01a146dd-372d-7b14-a7de-1260f616669f
+
+PASS 13 / FAIL 0 / WARN 1 / SKIP 0

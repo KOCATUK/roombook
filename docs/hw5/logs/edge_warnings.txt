@@ -1,0 +1,140 @@
+{
+  "id": "6e898454-83d2-4640-a84c-cc74cb4d4ee1",
+  "date": "2026-10-16T22:37:44.884Z",
+  "method": "PATCH",
+  "pathname": "/rest/v1/bookings",
+  "status": "403",
+  "timestamp": "2026-10-16T22:37:44.884000",
+  "level": "warning",
+  "event_message": "PATCH | 403 | https://unujoliagstdbkonilfd.supabase.co/rest/v1/bookings?id=eq.09925637-b63c-4d3b-a509-f626299a325f | node",
+  "log_type": "edge",
+  "log_count": null,
+  "logs": [],
+  "auth_user": "<user-id-1>"
+}
+{
+  "id": "fc932a95-d30d-417d-8286-2500aa850581",
+  "date": "2026-10-16T22:37:44.682Z",
+  "method": "POST",
+  "pathname": "/rest/v1/bookings",
+  "status": "403",
+  "timestamp": "2026-10-16T22:37:44.682000",
+  "level": "warning",
+  "event_message": "POST | 403 | https://unujoliagstdbkonilfd.supabase.co/rest/v1/bookings | node",
+  "log_type": "edge",
+  "log_count": null,
+  "logs": [],
+  "auth_user": "<user-id-1>"
+}
+{
+  "id": "f061e96e-d818-48ec-9c2b-ad6ab5f7071e",
+  "date": "2026-10-16T22:37:44.576Z",
+  "method": "POST",
+  "pathname": "/rest/v1/bookings",
+  "status": "400",
+  "timestamp": "2026-10-16T22:37:44.576000",
+  "level": "warning",
+  "event_message": "POST | 400 | https://unujoliagstdbkonilfd.supabase.co/rest/v1/bookings | node",
+  "log_type": "edge",
+  "log_count": null,
+  "logs": [],
+  "auth_user": "<user-id-1>"
+}
+{
+  "id": "8e24afa5-5ce8-4c68-83fa-bbbd88dbeca2",
+  "date": "2026-10-16T22:37:44.307Z",
+  "method": "POST",
+  "pathname": "/rest/v1/bookings",
+  "status": "400",
+  "timestamp": "2026-10-16T22:37:44.307000",
+  "level": "warning",
+  "event_message": "POST | 400 | https://unujoliagstdbkonilfd.supabase.co/rest/v1/bookings | node",
+  "log_type": "edge",
+  "log_count": null,
+  "logs": [],
+  "auth_user": "<user-id-1>"
+}
+{
+  "id": "144ffa76-0996-499c-b710-7e37baad4749",
+  "date": "2026-10-16T22:37:43.733Z",
+  "method": "POST",
+  "pathname": "/rest/v1/bookings",
+  "status": "401",
+  "timestamp": "2026-10-16T22:37:43.733000",
+  "level": "warning",
+  "event_message": "POST | 401 | https://unujoliagstdbkonilfd.supabase.co/rest/v1/bookings | node",
+  "log_type": "edge",
+  "log_count": null,
+  "logs": [],
+  "auth_user": null
+}
+{
+  "id": "3046eb3d-2ddf-4815-8c50-bd72ba9e1492",
+  "date": "2026-10-16T22:37:43.590Z",
+  "method": "GET",
+  "pathname": "/rest/v1/profiles",
+  "status": "401",
+  "timestamp": "2026-10-16T22:37:43.590000",
+  "level": "warning",
+  "event_message": "GET | 401 | https://unujoliagstdbkonilfd.supabase.co/rest/v1/profiles?select=id&limit=1 | node",
+  "log_type": "edge",
+  "log_count": null,
+  "logs": [],
+  "auth_user": null
+}
+{
+  "id": "25ede907-c301-4556-b20d-a9622048d252",
+  "date": "2026-10-16T22:29:20.254Z",
+  "method": "POST",
+  "pathname": "/rest/v1/bookings",
+  "status": "401",
+  "timestamp": "2026-10-16T22:29:20.254000",
+  "level": "warning",
+  "event_message": "POST | 401 | https://unujoliagstdbkonilfd.supabase.co/rest/v1/bookings | node",
+  "log_type": "edge",
+  "log_count": null,
+  "logs": [],
+  "auth_user": null
+}
+{
+  "id": "0c3a6013-d92b-4d6c-b620-9b669f7de7e3",
+  "date": "2026-10-16T22:29:20.098Z",
+  "method": "GET",
+  "pathname": "/rest/v1/profiles",
+  "status": "401",
+  "timestamp": "2026-10-16T22:29:20.098000",
+  "level": "warning",
+  "event_message": "GET | 401 | https://unujoliagstdbkonilfd.supabase.co/rest/v1/profiles?select=id&limit=1 | node",
+  "log_type": "edge",
+  "log_count": null,
+  "logs": [],
+  "auth_user": null
+}
+{
+  "id": "cbfca502-e92f-4e2b-ae33-69b544acd3d6",
+  "date": "2026-10-16T22:29:07.480Z",
+  "method": "POST",
+  "pathname": "/rest/v1/bookings",
+  "status": "401",
+  "timestamp": "2026-10-16T22:29:07.480000",
+  "level": "warning",
+  "event_message": "POST | 401 | https://unujoliagstdbkonilfd.supabase.co/rest/v1/bookings | node",
+  "log_type": "edge",
+  "log_count": null,
+  "logs": [],
+  "auth_user": null
+}
+{
+  "id": "135e43b7-9e33-4869-9de1-d4d524e0ac69",
+  "date": "2026-10-16T22:29:07.295Z",
+  "method": "GET",
+  "pathname": "/rest/v1/profiles",
+  "status": "401",
+  "timestamp": "2026-10-16T22:29:07.295000",
+  "level": "warning",
+  "event_message": "GET | 401 | https://unujoliagstdbkonilfd.supabase.co/rest/v1/profiles?select=id&limit=1 | node",
+  "log_type": "edge",
+  "log_count": null,
+  "logs": [],
+  "auth_user": null
+}
