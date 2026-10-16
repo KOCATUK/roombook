@@ -1,3 +1,5 @@
+import { PANEL_CLASS_NAME } from '../classNames'
+
 interface LoadingStateProps {
   /** Текст для скринридера: сам скелетон он не озвучивает */
   label?: string
@@ -41,7 +43,7 @@ export function LoadingState({
         <div
           key={index}
           aria-hidden="true"
-          className="flex flex-col gap-4 rounded-xl border border-(--border) bg-(--bg) p-5 shadow-(--shadow)"
+          className={`flex flex-col gap-4 p-5 ${PANEL_CLASS_NAME}`}
         >
           <div className={`h-5 w-1/2 ${PULSE_CLASS_NAME}`} />
           <div className={`h-4 w-3/4 ${PULSE_CLASS_NAME}`} />

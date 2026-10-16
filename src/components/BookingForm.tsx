@@ -11,6 +11,12 @@ import type {
 import { BOOKING_ERROR_MESSAGES } from '../utils/bookingErrors'
 import { validateBooking } from '../utils/bookings'
 import { combineDateTime, formatTime, getDatePart } from '../utils/dateTime'
+import {
+  FOCUS_RING_CLASS_NAME,
+  PANEL_CLASS_NAME,
+  PANEL_HEADING_CLASS_NAME,
+  PRIMARY_BUTTON_CLASS_NAME,
+} from './classNames'
 import { ErrorState } from './states/ErrorState'
 
 interface BookingFormProps {
@@ -39,8 +45,7 @@ const DATE_ERRORS: BookingErrorCode[] = ['invalidDateTime', 'startInPast']
 
 const SAVE_ERROR_MESSAGE = 'Не удалось сохранить бронь'
 
-const CONTROL_CLASS_NAME =
-  'min-h-11 w-full rounded-lg border border-(--border) bg-(--bg) px-2.5 py-2 text-(--text-h) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent) disabled:cursor-not-allowed disabled:opacity-60 aria-invalid:border-(--booking-form-error)'
+const CONTROL_CLASS_NAME = `min-h-11 w-full rounded-lg border border-(--border) bg-(--bg) px-2.5 py-2 text-(--text-h) disabled:cursor-not-allowed disabled:opacity-60 aria-invalid:border-(--booking-form-error) ${FOCUS_RING_CLASS_NAME}`
 
 const FIELD_CLASS_NAME = 'flex min-w-0 flex-col gap-1'
 
@@ -135,7 +140,7 @@ export function BookingForm({
 
       <form
         // В общей палитре нет цвета ошибки, поэтому он объявлен на уровне компонента
-        className="flex flex-col gap-4 rounded-xl border border-(--border) bg-(--bg) p-5 text-(--text) shadow-(--shadow) [--booking-form-error:#b91c1c] dark:[--booking-form-error:#f87171]"
+        className={`flex flex-col gap-4 p-5 ${PANEL_CLASS_NAME} [--booking-form-error:#b91c1c] dark:[--booking-form-error:#f87171]`}
         aria-labelledby={headingId}
         aria-busy={isSubmitting}
         // Встроенная проверка браузера показывает свои подсказки и не знает о пересечениях,
@@ -146,7 +151,7 @@ export function BookingForm({
           void handleSubmit()
         }}
       >
-        <h2 className="m-0 text-[20px] leading-[1.2]" id={headingId}>
+        <h2 className={PANEL_HEADING_CLASS_NAME} id={headingId}>
           Новая бронь
         </h2>
 
@@ -257,7 +262,7 @@ export function BookingForm({
         )}
 
         <button
-          className="cursor-pointer rounded-lg bg-(--accent) px-4 py-2.5 font-medium text-white transition-[filter] duration-150 ease-[ease] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent) enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:bg-(--border) disabled:text-(--text) dark:enabled:text-[#16171d]"
+          className={PRIMARY_BUTTON_CLASS_NAME}
           type="submit"
           disabled={isSubmitting}
         >

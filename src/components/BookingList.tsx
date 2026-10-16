@@ -3,6 +3,11 @@ import { flushSync } from 'react-dom'
 import type { AsyncState, Booking, Room } from '../types'
 import { getRoomBookings } from '../utils/bookings'
 import { formatDate, formatTime } from '../utils/dateTime'
+import {
+  FOCUS_RING_CLASS_NAME,
+  PANEL_CLASS_NAME,
+  PANEL_HEADING_CLASS_NAME,
+} from './classNames'
 import { ErrorState } from './states/ErrorState'
 import { LoadingState } from './states/LoadingState'
 
@@ -21,16 +26,13 @@ interface BookingListItemProps {
 
 type CancelStep = 'idle' | 'confirming' | 'cancelling' | 'error'
 
-const FOCUS_CLASS_NAME =
-  'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent)'
-
 // Размер для пальца зависит от способа ввода, а не от ширины экрана:
 // планшет широкий, но сенсорный, поэтому pointer-coarse, а не sm/md
 const TOUCH_CLASS_NAME = 'pointer-coarse:min-h-11 pointer-coarse:px-4'
 
-const SECONDARY_BUTTON_CLASS_NAME = `cursor-pointer rounded-md border border-(--accent-border) px-2.5 py-1 text-[13px] text-(--accent) enabled:hover:bg-(--accent-bg) disabled:cursor-not-allowed disabled:opacity-60 ${TOUCH_CLASS_NAME} ${FOCUS_CLASS_NAME}`
+const SECONDARY_BUTTON_CLASS_NAME = `cursor-pointer rounded-md border border-(--accent-border) px-2.5 py-1 text-[13px] text-(--accent) enabled:hover:bg-(--accent-bg) disabled:cursor-not-allowed disabled:opacity-60 ${TOUCH_CLASS_NAME} ${FOCUS_RING_CLASS_NAME}`
 
-const PRIMARY_BUTTON_CLASS_NAME = `cursor-pointer rounded-md bg-(--accent) px-2.5 py-1 text-[13px] font-medium text-white enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60 dark:text-[#16171d] ${TOUCH_CLASS_NAME} ${FOCUS_CLASS_NAME}`
+const PRIMARY_BUTTON_CLASS_NAME = `cursor-pointer rounded-md bg-(--accent) px-2.5 py-1 text-[13px] font-medium text-white enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60 dark:text-[#16171d] ${TOUCH_CLASS_NAME} ${FOCUS_RING_CLASS_NAME}`
 
 function BookingListItem({ booking, onCancel }: BookingListItemProps) {
   const [step, setStep] = useState<CancelStep>('idle')
@@ -164,11 +166,11 @@ export function BookingList({
 
   return (
     <section
-      className="flex flex-col gap-3 rounded-xl border border-(--border) bg-(--bg) p-5 text-(--text) shadow-(--shadow)"
+      className={`flex flex-col gap-3 p-5 ${PANEL_CLASS_NAME}`}
       aria-labelledby={headingId}
       aria-busy={bookingsState.status === 'loading'}
     >
-      <h2 className="m-0 text-[20px] leading-[1.2]" id={headingId}>
+      <h2 className={PANEL_HEADING_CLASS_NAME} id={headingId}>
         Расписание: {room.name}
       </h2>
 

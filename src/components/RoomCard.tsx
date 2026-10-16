@@ -1,5 +1,10 @@
 import type { Booking, Equipment, Room } from '../types'
 import { formatTime } from '../utils/dateTime'
+import {
+  PANEL_CLASS_NAME,
+  PANEL_HEADING_CLASS_NAME,
+  PRIMARY_BUTTON_CLASS_NAME,
+} from './classNames'
 
 interface RoomCardProps {
   room: Room
@@ -39,11 +44,11 @@ export function RoomCard({ room, currentBooking, onBook }: RoomCardProps) {
 
   return (
     <article
-      className={`flex flex-col gap-4 rounded-xl border border-(--border) bg-(--bg) p-4 text-left text-(--text) shadow-(--shadow) sm:p-5${isOccupied ? ' opacity-85' : ''}`}
+      className={`flex flex-col gap-4 p-4 text-left sm:p-5 ${PANEL_CLASS_NAME}${isOccupied ? ' opacity-85' : ''}`}
       aria-labelledby={`room-card-title-${id}`}
     >
       <header className="flex items-start justify-between gap-3">
-        <h3 className="m-0 text-[20px] leading-[1.2]" id={`room-card-title-${id}`}>
+        <h3 className={PANEL_HEADING_CLASS_NAME} id={`room-card-title-${id}`}>
           {name}
         </h3>
         <span
@@ -96,7 +101,7 @@ export function RoomCard({ room, currentBooking, onBook }: RoomCardProps) {
       <button
         // mt-auto прижимает кнопку к низу: карточки в ряду сетки растянуты до одной высоты,
         // и без этого кнопки стояли бы на разной высоте
-        className="mt-auto min-h-11 cursor-pointer rounded-lg bg-(--accent) px-4 py-2.5 font-medium text-white transition-[filter] duration-150 ease-[ease] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent) enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:bg-(--border) disabled:text-(--text) dark:enabled:text-[#16171d]"
+        className={`mt-auto min-h-11 ${PRIMARY_BUTTON_CLASS_NAME}`}
         type="button"
         // Не блокируем: занятую сейчас комнату можно забронировать на другое время
         aria-describedby={isOccupied ? `${statusId} ${bookingId}` : undefined}

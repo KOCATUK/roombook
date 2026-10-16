@@ -55,14 +55,19 @@ function delay(scenario: Scenario): Promise<void> {
   return new Promise((resolve) => window.setTimeout(resolve, ms))
 }
 
+async function startRequest(): Promise<Scenario> {
+  const scenario = getScenario()
+  await delay(scenario)
+  return scenario
+}
+
 // Отдаём копии, чтобы вызывающий код не мог изменить «серверные» данные в обход API
 function cloneBooking(booking: Booking): Booking {
   return { ...booking }
 }
 
 export async function getRooms(): Promise<Room[]> {
-  const scenario = getScenario()
-  await delay(scenario)
+  const scenario = await startRequest()
 
   if (scenario === 'error') {
     throw new ApiError('loadFailed', 'Не удалось загрузить комнаты')
@@ -75,8 +80,7 @@ export async function getRooms(): Promise<Room[]> {
 
 /** Без roomId возвращает все брони, с roomId — расписание комнаты по времени */
 export async function getBookings(roomId?: Room['id']): Promise<Booking[]> {
-  const scenario = getScenario()
-  await delay(scenario)
+  const scenario = await startRequest()
 
   if (scenario === 'error') {
     throw new ApiError('loadFailed', 'Не удалось загрузить расписание')
@@ -89,8 +93,7 @@ export async function getBookings(roomId?: Room['id']): Promise<Booking[]> {
 }
 
 export async function createBooking(draft: BookingDraft): Promise<Booking> {
-  const scenario = getScenario()
-  await delay(scenario)
+  const scenario = await startRequest()
 
   if (scenario === 'saveError') {
     throw new ApiError('saveFailed', 'Не удалось сохранить бронь')
@@ -115,8 +118,7 @@ export async function createBooking(draft: BookingDraft): Promise<Booking> {
 }
 
 export async function cancelBooking(id: Booking['id']): Promise<void> {
-  const scenario = getScenario()
-  await delay(scenario)
+  const scenario = await startRequest()
 
   if (scenario === 'saveError') {
     throw new ApiError('saveFailed', 'Не удалось отменить бронь')
