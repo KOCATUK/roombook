@@ -265,7 +265,7 @@ export function BookingForm({
           type="submit"
           disabled={isSubmitting}
         >
-          {isSubmitting ? 'Сохранение…' : 'Забронировать'}
+          {isSubmitting ? 'Сохраняем…' : 'Забронировать'}
         </button>
       </form>
     </div>

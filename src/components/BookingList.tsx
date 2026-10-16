@@ -95,7 +95,7 @@ function BookingListItem({ booking, onCancel }: BookingListItemProps) {
               disabled={isCancelling}
               onClick={() => void handleConfirm()}
             >
-              {isCancelling ? 'Отмена…' : 'Да'}
+              {isCancelling ? 'Отменяем…' : 'Да'}
             </button>
             <button
               ref={noButtonRef}
