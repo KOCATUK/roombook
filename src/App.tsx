@@ -103,7 +103,7 @@ function App() {
     return (
       <div className="flex flex-col gap-4">
         <p>{formatRoomSummary(getRoomSummary(rooms, bookings, now))}</p>
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-6">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
           {rooms.map((room) => (
             <RoomCard
               key={room.id}
@@ -119,15 +119,16 @@ function App() {
 
   return (
     <main className="mx-auto max-w-[1126px] px-4 py-8">
-      <h1 className="mb-2">Переговорные</h1>
+      <h1 className="mb-1">Переговорные</h1>
 
       {/* div, а не p: правило p { margin: 0 } в index.css вне слоёв и перебивает утилиты отступов */}
-      <div className="mb-4 min-h-[1.45em] text-(--accent)" role="status">
+      <div className="mb-3 min-h-[1.45em] text-(--accent) sm:mb-4" role="status">
         {notice}
       </div>
 
       {selectedRoom && (
-        <div className="mb-8 grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] items-start gap-6">
+        // На широком экране форме хватает 24rem, остальную ширину получает расписание
+        <div className="mb-8 grid grid-cols-1 items-start gap-4 md:grid-cols-2 lg:grid-cols-[minmax(0,24rem)_1fr] lg:gap-6">
           <BookingForm
             rooms={rooms}
             bookings={bookings}

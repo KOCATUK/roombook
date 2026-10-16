@@ -1,6 +1,5 @@
 import type { Booking, Equipment, Room } from '../types'
 import { formatTime } from '../utils/dateTime'
-import './RoomCard.css'
 
 interface RoomCardProps {
   room: Room
@@ -14,6 +13,15 @@ const EQUIPMENT_LABELS: Record<Equipment, string> = {
   whiteboard: 'Доска',
   videoConference: 'Видеосвязь',
 }
+
+const STATUS_CLASS_NAME =
+  'shrink-0 rounded-full px-2.5 py-0.5 text-[13px] font-medium whitespace-nowrap'
+
+const FREE_STATUS_CLASS_NAME =
+  'bg-[rgba(34,197,94,0.12)] text-[#15803d] dark:text-[#4ade80]'
+
+const OCCUPIED_STATUS_CLASS_NAME =
+  'bg-[rgba(239,68,68,0.12)] text-[#b91c1c] dark:text-[#f87171]'
 
 const pluralRules = new Intl.PluralRules('ru-RU')
 
@@ -31,15 +39,15 @@ export function RoomCard({ room, currentBooking, onBook }: RoomCardProps) {
 
   return (
     <article
-      className={`room-card${isOccupied ? ' room-card--occupied' : ''}`}
+      className={`flex flex-col gap-4 rounded-xl border border-(--border) bg-(--bg) p-4 text-left text-(--text) shadow-(--shadow) sm:p-5${isOccupied ? ' opacity-85' : ''}`}
       aria-labelledby={`room-card-title-${id}`}
     >
-      <header className="room-card__header">
-        <h3 className="room-card__title" id={`room-card-title-${id}`}>
+      <header className="flex items-start justify-between gap-3">
+        <h3 className="m-0 text-[20px] leading-[1.2]" id={`room-card-title-${id}`}>
           {name}
         </h3>
         <span
-          className={`room-card__status room-card__status--${isOccupied ? 'occupied' : 'free'}`}
+          className={`${STATUS_CLASS_NAME} ${isOccupied ? OCCUPIED_STATUS_CLASS_NAME : FREE_STATUS_CLASS_NAME}`}
           id={statusId}
         >
           {currentBooking ? `Занята до ${formatTime(currentBooking.end)}` : 'Свободна'}
@@ -48,37 +56,47 @@ export function RoomCard({ room, currentBooking, onBook }: RoomCardProps) {
 
       {currentBooking && (
         // Название брони приходит из данных и может быть любой длины, поэтому оно
-        // вынесено из бейджа: бейдж не переносится и вылезал бы за край карточки
-        <p className="room-card__booking" id={bookingId} title={currentBooking.title}>
+        // вынесено из бейджа: бейдж не переносится и вылезал бы за край карточки.
+        // Полный текст остаётся в DOM для скринридеров и в title для мыши
+        <p
+          className="line-clamp-2 text-[14px] wrap-anywhere text-(--text-h)"
+          id={bookingId}
+          title={currentBooking.title}
+        >
           {currentBooking.title}
         </p>
       )}
 
-      <dl className="room-card__details">
-        <div className="room-card__detail">
-          <dt className="room-card__detail-label">Этаж</dt>
-          <dd className="room-card__detail-value">{floor}</dd>
+      <dl className="flex gap-6">
+        <div>
+          <dt className="text-[13px]">Этаж</dt>
+          <dd className="font-medium text-(--text-h)">{floor}</dd>
         </div>
-        <div className="room-card__detail">
-          <dt className="room-card__detail-label">Вместимость</dt>
-          <dd className="room-card__detail-value">{formatCapacity(capacity)}</dd>
+        <div>
+          <dt className="text-[13px]">Вместимость</dt>
+          <dd className="font-medium text-(--text-h)">{formatCapacity(capacity)}</dd>
         </div>
       </dl>
 
       {equipment.length > 0 ? (
-        <ul className="room-card__equipment" aria-label="Оборудование">
+        <ul className="flex flex-wrap gap-2" aria-label="Оборудование">
           {equipment.map((item) => (
-            <li className="room-card__equipment-item" key={item}>
+            <li
+              className="rounded-md border border-(--accent-border) bg-(--accent-bg) px-2.5 py-1 text-[14px] text-(--accent)"
+              key={item}
+            >
               {EQUIPMENT_LABELS[item]}
             </li>
           ))}
         </ul>
       ) : (
-        <p className="room-card__equipment-empty">Без оборудования</p>
+        <p className="text-[14px] italic">Без оборудования</p>
       )}
 
       <button
-        className="room-card__button"
+        // mt-auto прижимает кнопку к низу: карточки в ряду сетки растянуты до одной высоты,
+        // и без этого кнопки стояли бы на разной высоте
+        className="mt-auto min-h-11 cursor-pointer rounded-lg bg-(--accent) px-4 py-2.5 font-medium text-white transition-[filter] duration-150 ease-[ease] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent) enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:bg-(--border) disabled:text-(--text) dark:enabled:text-[#16171d]"
         type="button"
         // Не блокируем: занятую сейчас комнату можно забронировать на другое время
         aria-describedby={isOccupied ? `${statusId} ${bookingId}` : undefined}

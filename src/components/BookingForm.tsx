@@ -40,7 +40,7 @@ const DATE_ERRORS: BookingErrorCode[] = ['invalidDateTime', 'startInPast']
 const SAVE_ERROR_MESSAGE = 'Не удалось сохранить бронь'
 
 const CONTROL_CLASS_NAME =
-  'w-full rounded-lg border border-(--border) bg-(--bg) px-2.5 py-2 text-(--text-h) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent) disabled:cursor-not-allowed disabled:opacity-60 aria-invalid:border-(--booking-form-error)'
+  'min-h-11 w-full rounded-lg border border-(--border) bg-(--bg) px-2.5 py-2 text-(--text-h) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent) disabled:cursor-not-allowed disabled:opacity-60 aria-invalid:border-(--booking-form-error)'
 
 const FIELD_CLASS_NAME = 'flex min-w-0 flex-col gap-1'
 
@@ -207,7 +207,7 @@ export function BookingForm({
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3">
           <div className={FIELD_CLASS_NAME}>
             <label className={LABEL_CLASS_NAME} htmlFor={`${id}-start`}>
               Начало

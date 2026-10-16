@@ -24,9 +24,13 @@ type CancelStep = 'idle' | 'confirming' | 'cancelling' | 'error'
 const FOCUS_CLASS_NAME =
   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent)'
 
-const SECONDARY_BUTTON_CLASS_NAME = `cursor-pointer rounded-md border border-(--accent-border) px-2.5 py-1 text-[13px] text-(--accent) enabled:hover:bg-(--accent-bg) disabled:cursor-not-allowed disabled:opacity-60 ${FOCUS_CLASS_NAME}`
+// Размер для пальца зависит от способа ввода, а не от ширины экрана:
+// планшет широкий, но сенсорный, поэтому pointer-coarse, а не sm/md
+const TOUCH_CLASS_NAME = 'pointer-coarse:min-h-11 pointer-coarse:px-4'
 
-const PRIMARY_BUTTON_CLASS_NAME = `cursor-pointer rounded-md bg-(--accent) px-2.5 py-1 text-[13px] font-medium text-white enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60 dark:text-[#16171d] ${FOCUS_CLASS_NAME}`
+const SECONDARY_BUTTON_CLASS_NAME = `cursor-pointer rounded-md border border-(--accent-border) px-2.5 py-1 text-[13px] text-(--accent) enabled:hover:bg-(--accent-bg) disabled:cursor-not-allowed disabled:opacity-60 ${TOUCH_CLASS_NAME} ${FOCUS_CLASS_NAME}`
+
+const PRIMARY_BUTTON_CLASS_NAME = `cursor-pointer rounded-md bg-(--accent) px-2.5 py-1 text-[13px] font-medium text-white enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60 dark:text-[#16171d] ${TOUCH_CLASS_NAME} ${FOCUS_CLASS_NAME}`
 
 function BookingListItem({ booking, onCancel }: BookingListItemProps) {
   const [step, setStep] = useState<CancelStep>('idle')
@@ -67,7 +71,7 @@ function BookingListItem({ booking, onCancel }: BookingListItemProps) {
         {booking.title}
       </span>
 
-      <div className="mt-1.5 flex flex-wrap items-center gap-2">
+      <div className="mt-1.5 flex flex-wrap items-center gap-2 pointer-coarse:gap-3">
         {step === 'idle' && (
           <button
             ref={cancelButtonRef}
