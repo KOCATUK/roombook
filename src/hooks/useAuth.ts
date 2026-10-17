@@ -68,6 +68,24 @@ function isLoginPending(): boolean {
   }
 }
 
+// Сессию уже отозвали (выход на другом устройстве, истёкший токен): цель выхода
+// достигнута, а локальную сессию supabase-js удаляет при scope 'local' в любом случае
+function isSessionAlreadyGone(error: unknown): boolean {
+  if (typeof error !== 'object' || error === null) {
+    return false
+  }
+  const name: unknown = Reflect.get(error, 'name')
+  const status: unknown = Reflect.get(error, 'status')
+  const code: unknown = Reflect.get(error, 'code')
+  return (
+    name === 'AuthSessionMissingError' ||
+    code === 'session_not_found' ||
+    status === 401 ||
+    status === 403 ||
+    status === 404
+  )
+}
+
 function reportError(error: unknown, operation: ApiOperation): string {
   const appError = toAppError(error, operation)
   logger.error('Auth request failed', {
@@ -130,11 +148,16 @@ export function useAuth(): UseAuthResult {
     }
     setError('')
     try {
-      const { error: signOutError } = await supabase.auth.signOut()
+      // По умолчанию scope 'global' выбивает пользователя на всех устройствах
+      // (docs/hw6/log_analysis/log_analysis.md, L-01)
+      const { error: signOutError } = await supabase.auth.signOut({ scope: 'local' })
       if (signOutError) {
         throw signOutError
       }
     } catch (caught: unknown) {
+      if (isSessionAlreadyGone(caught)) {
+        return
+      }
       setError(reportError(caught, 'signOut'))
     }
   }, [])
