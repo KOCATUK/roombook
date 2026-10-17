@@ -1,0 +1,29 @@
+# npm audit, 2026-10-17 09:24, node v24.21.0, npm 11.19.0
+# commit 632b6af, package-lock.json без изменений
+
+$ npm audit
+found 0 vulnerabilities
+
+$ npm audit --json
+{
+  "auditReportVersion": 2,
+  "vulnerabilities": {},
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "dependencies": {
+      "prod": 13,
+      "dev": 289,
+      "optional": 50,
+      "peer": 8,
+      "peerOptional": 0,
+      "total": 301
+    }
+  }
+}
