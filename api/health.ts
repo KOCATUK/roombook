@@ -53,7 +53,7 @@ async function checkSupabase(): Promise<SupabaseCheckResult> {
   }
 }
 
-export async function GET(request: Request): Promise<Response> {
+async function runHealthCheck(request: Request, logOk: boolean): Promise<Response> {
   const logger = createRequestLogger(ROUTE, request)
   const supabase = await checkSupabase()
   const isOk = supabase.status === 'ok'
@@ -65,15 +65,29 @@ export async function GET(request: Request): Promise<Response> {
     timestamp: new Date().toISOString(),
   }
 
-  if (isOk) {
-    logger.log('info', 'health check ok', { supabase_ms: supabase.latencyMs })
-  } else {
+  if (!isOk) {
     logger.log('warn', 'health check degraded', {
       supabase_ms: supabase.latencyMs,
       reason: supabase.reason,
       http_status: supabase.httpStatus,
     })
+  } else if (logOk) {
+    logger.log('info', 'health check ok', { supabase_ms: supabase.latencyMs })
   }
 
   return jsonResponse(body, isOk ? 200 : 503)
+}
+
+export function GET(request: Request): Promise<Response> {
+  return runHealthCheck(request, true)
+}
+
+/**
+ * Мониторы (UptimeRobot) по умолчанию шлют HEAD; без него Vercel отвечал 405.
+ * Проверка та же, статус и заголовки как у GET, но без тела. Успешные HEAD
+ * не логируем: монитор ходит каждые несколько минут, а сбои всё равно попадут в лог
+ */
+export async function HEAD(request: Request): Promise<Response> {
+  const response = await runHealthCheck(request, false)
+  return new Response(null, { status: response.status, headers: response.headers })
 }

@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { GET } from '../health.js'
+import { GET, HEAD } from '../health.js'
 import type { HealthBody } from '../health.js'
 
 const SUPABASE_URL = 'https://example.supabase.co'
@@ -137,5 +137,48 @@ describe('GET /api/health', () => {
     })
     expect(typeof line.latencyMs).toBe('number')
     expect(typeof line.ts).toBe('string')
+  })
+})
+
+describe('HEAD /api/health', () => {
+  const fetchMock = vi.fn<typeof fetch>()
+
+  beforeEach(() => {
+    vi.stubGlobal('fetch', fetchMock)
+    vi.stubEnv('VITE_SUPABASE_URL', SUPABASE_URL)
+    vi.stubEnv('VITE_SUPABASE_ANON_KEY', ANON_KEY)
+    vi.spyOn(console, 'info').mockImplementation(() => {})
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+  })
+
+  afterEach(() => {
+    fetchMock.mockReset()
+    vi.unstubAllGlobals()
+    vi.unstubAllEnvs()
+    vi.restoreAllMocks()
+  })
+
+  it('Supabase отвечает → 200 с заголовками GET, без тела и без записи в лог', async () => {
+    fetchMock.mockResolvedValue(new Response('[]', { status: 200 }))
+
+    const head = await HEAD(healthRequest())
+    const get = await GET(healthRequest())
+
+    expect(head.status).toBe(200)
+    expect(head.headers.get('Cache-Control')).toBe(get.headers.get('Cache-Control'))
+    expect(head.headers.get('Content-Type')).toBe(get.headers.get('Content-Type'))
+    expect(head.body).toBeNull()
+    // Одна строка от GET, от HEAD ни одной
+    expect(console.info).toHaveBeenCalledTimes(1)
+  })
+
+  it('Supabase недоступен → 503 и предупреждение в логе', async () => {
+    fetchMock.mockRejectedValue(new TypeError('fetch failed'))
+
+    const head = await HEAD(healthRequest())
+
+    expect(head.status).toBe(503)
+    expect(head.body).toBeNull()
+    expect(lastLogLine(vi.mocked(console.warn)).reason).toBe('network')
   })
 })
