@@ -1,0 +1,69 @@
+Записей: 98 (edge: 92, postgres: 6)
+Период (UTC): 2026-10-17T07:01:11.388Z .. 2026-10-17T07:29:38.157Z
+
+== log_type / level / status
+  81  edge success 200
+   8  edge success 302
+   6  postgres success 00000
+   1  edge warning 403
+   1  edge success 201
+   1  edge success 204
+
+== edge: метод / путь / статус
+  36  GET /rest/v1/bookings 200
+  23  GET /rest/v1/rooms 200
+   9  OPTIONS /rest/v1/bookings 200
+   4  POST /auth/v1/token 200
+   4  GET /auth/v1/callback 302
+   4  GET /auth/v1/authorize 302
+   4  OPTIONS /rest/v1/rooms 200
+   3  OPTIONS /auth/v1/token 200
+   1  DELETE /rest/v1/bookings 200
+   1  POST /auth/v1/logout 403
+   1  POST /rest/v1/bookings 201
+   1  POST /auth/v1/logout 204
+   1  OPTIONS /auth/v1/logout 200
+
+== edge: устройство по User-Agent
+  71  Windows
+  21  Android (эмуляция)
+
+== GET REST: форма запроса
+  26  /rest/v1/bookings?select=id,room_id,user_id,title,starts_at,ends_at&order=starts_at.asc
+  20  /rest/v1/rooms?select=id,name,floor,capacity,equipment&order=floor.asc,name.asc
+  10  /rest/v1/bookings?select=id,room_id,user_id,title,starts_at,ends_at,profiles(display_name)&order=starts_at.asc
+   3  /rest/v1/rooms?select=id&limit=1
+
+Максимум запросов в минуту: 18
+
+== Хронология входов, выходов и изменений (UTC)
+2026-10-17T07:21:07.448Z  GET    /auth/v1/authorize   302  mobile  
+2026-10-17T07:21:08.493Z  GET    /auth/v1/callback    302  mobile  
+2026-10-17T07:21:09.890Z  POST   /auth/v1/token       200  mobile  
+2026-10-17T07:21:21.875Z  OPTIONS /auth/v1/logout      200  mobile  
+2026-10-17T07:21:21.969Z  POST   /auth/v1/logout      204  mobile  с пользователем
+2026-10-17T07:21:22.942Z  GET    /auth/v1/authorize   302  mobile  
+2026-10-17T07:21:23.402Z  GET    /auth/v1/callback    302  mobile  
+2026-10-17T07:21:24.729Z  POST   /auth/v1/token       200  mobile  
+2026-10-17T07:25:30.519Z  POST   /rest/v1/bookings    201  desktop с пользователем
+2026-10-17T07:26:50.180Z  POST   /auth/v1/logout      403  desktop с пользователем
+2026-10-17T07:26:51.986Z  GET    /auth/v1/authorize   302  desktop 
+2026-10-17T07:26:53.709Z  GET    /auth/v1/callback    302  desktop 
+2026-10-17T07:26:55.104Z  POST   /auth/v1/token       200  desktop 
+2026-10-17T07:27:15.531Z  GET    /auth/v1/authorize   302  desktop 
+2026-10-17T07:27:31.316Z  GET    /auth/v1/callback    302  desktop 
+2026-10-17T07:27:32.661Z  POST   /auth/v1/token       200  desktop 
+2026-10-17T07:29:04.301Z  DELETE /rest/v1/bookings    200  desktop с пользователем
+
+== Предупреждения и ошибки edge (статус >= 400)
+2026-10-17T07:26:50.180Z  POST /auth/v1/logout 403
+5xx: 0
+
+== postgres
+2026-10-17T07:29:38.157Z  success  checkpoint complete: wrote 41 buffers (0.1%); 0 WAL file(s) 
+2026-10-17T07:29:34.120Z  success  checkpoint starting: time
+2026-10-17T07:24:37.793Z  success  checkpoint complete: wrote 35 buffers (0.1%); 0 WAL file(s) 
+2026-10-17T07:24:34.290Z  success  checkpoint starting: time
+2026-10-17T07:04:34.265Z  success  checkpoint complete: wrote 1 buffers (0.0%); 0 WAL file(s) a
+2026-10-17T07:04:34.144Z  success  checkpoint starting: time
+Ошибок уровня error/fatal/panic: 0
