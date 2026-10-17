@@ -2,6 +2,7 @@ import type { Session } from '@supabase/supabase-js'
 import { useCallback, useEffect, useState } from 'react'
 import { toAppError } from '../api/appError'
 import type { ApiOperation } from '../api/appError'
+import { trackEvent } from '../lib/analytics'
 import { logger } from '../lib/logger'
 import { supabase } from '../lib/supabase'
 
@@ -43,6 +44,30 @@ function toAuthUser(session: Session): AuthUser {
   }
 }
 
+// SIGNED_IN приходит и при возврате на вкладку, поэтому login отправляем только
+// после перехода на GitHub из этой вкладки; sessionStorage переживает редирект
+const LOGIN_PENDING_KEY = 'roombook:login-pending'
+
+function setLoginPending(isPending: boolean) {
+  try {
+    if (isPending) {
+      sessionStorage.setItem(LOGIN_PENDING_KEY, '1')
+    } else {
+      sessionStorage.removeItem(LOGIN_PENDING_KEY)
+    }
+  } catch {
+    // Без sessionStorage (запрет в браузере) просто не будет события login
+  }
+}
+
+function isLoginPending(): boolean {
+  try {
+    return sessionStorage.getItem(LOGIN_PENDING_KEY) !== null
+  } catch {
+    return false
+  }
+}
+
 function reportError(error: unknown, operation: ApiOperation): string {
   const appError = toAppError(error, operation)
   logger.error('Auth request failed', {
@@ -66,7 +91,11 @@ export function useAuth(): UseAuthResult {
     }
     // Подписка сразу присылает INITIAL_SESSION, поэтому отдельный getSession не нужен.
     // Она же ловит возврат с GitHub, выход в другой вкладке и обновление токена
-    const { data } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+    const { data } = supabase.auth.onAuthStateChange((event, nextSession) => {
+      if (event === 'SIGNED_IN' && nextSession && isLoginPending()) {
+        setLoginPending(false)
+        trackEvent('login', { method: 'github' })
+      }
       setSession(nextSession)
       setIsLoading(false)
     })
@@ -80,6 +109,7 @@ export function useAuth(): UseAuthResult {
       return
     }
     setError('')
+    setLoginPending(true)
     try {
       const { error: signInError } = await supabase.auth.signInWithOAuth({
         provider: 'github',
@@ -89,6 +119,7 @@ export function useAuth(): UseAuthResult {
         throw signInError
       }
     } catch (caught: unknown) {
+      setLoginPending(false)
       setError(reportError(caught, 'signIn'))
     }
   }, [])

@@ -18,6 +18,7 @@ import { LoadingState } from './components/states/LoadingState'
 import { useAsync } from './hooks/useAsync'
 import { useAuth } from './hooks/useAuth'
 import { useNow } from './hooks/useNow'
+import { getErrorType, trackEvent } from './lib/analytics'
 import type { Booking, BookingDraft, Room } from './types'
 import { getCurrentBooking } from './utils/bookings'
 import { formatDate, formatTime } from './utils/dateTime'
@@ -84,7 +85,14 @@ function App() {
   // Ошибку не ловим: её показывает форма, чтобы сохранить введённые данные
   async function handleSubmit(draft: BookingDraft) {
     setNotice('')
-    const booking = await createBooking(draft)
+    let booking: Booking
+    try {
+      booking = await createBooking(draft)
+    } catch (error: unknown) {
+      trackEvent('booking_failed', { room_id: draft.roomId, error_type: getErrorType(error) })
+      throw error
+    }
+    trackEvent('booking_created', { room_id: booking.roomId })
     reloadBookings()
     const roomName = rooms.find((room) => room.id === booking.roomId)?.name ?? ''
     setNotice(
@@ -96,6 +104,7 @@ function App() {
   async function handleCancel(booking: Booking) {
     setNotice('')
     await cancelBooking(booking.id)
+    trackEvent('booking_cancelled', { room_id: booking.roomId })
     reloadBookings()
     setNotice(`Бронь «${booking.title}» отменена`)
   }
