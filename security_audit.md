@@ -34,9 +34,9 @@
 | ID | OWASP 2021 | Где | Серьёзность | Статус |
 |---|---|---|---|---|
 | S-01 | A05 Security Misconfiguration | нет файла конфигурации хостинга; `index.html` | Средняя | Исправлено: `vercel.json` |
-| S-02 | A04 Insecure Design | `supabase/migrations/20261016191012_schema.sql:55-59` | Средняя | Исправлено в миграции, применение и проверка на реальной БД — за пользователем |
-| S-03 | A01 Broken Access Control (лишние права) | `supabase/migrations/20261016191017_rls_policies.sql:38`, `:50` | Низкая | Исправлено в миграции, применение и проверка на реальной БД — за пользователем (только `profiles`; `UPDATE` на `bookings` оставлен) |
-| S-04 | A04 Insecure Design (валидация) | `supabase/migrations/20261016191012_schema.sql:16-17` | Низкая | Исправлено в миграции, применение и проверка на реальной БД — за пользователем |
+| S-02 | A04 Insecure Design | `supabase/migrations/20261016191012_schema.sql:55-59` | Средняя | Исправлено и проверено на реальной БД (`docs/hw6/harden_check_result.md`) |
+| S-03 | A01 Broken Access Control (лишние права) | `supabase/migrations/20261016191017_rls_policies.sql:38`, `:50` | Низкая | Исправлено и проверено на реальной БД (`docs/hw6/harden_check_result.md`) (только `profiles`; `UPDATE` на `bookings` оставлен) |
+| S-04 | A04 Insecure Design (валидация) | `supabase/migrations/20261016191012_schema.sql:16-17` | Низкая | Исправлено и проверено на реальной БД (`docs/hw6/harden_check_result.md`) |
 | S-05 | A08 Software and Data Integrity Failures | `.github/workflows/ci.yml:26`, `:29`, `:55`, `:57` | Низкая | Открыто, рекомендация |
 | S-06 | A07 Identification and Authentication Failures | `src/lib/supabase.ts:13-18` | Низкая (остаточный риск) | Принято; смягчено CSP из S-01 |
 | S-07 | A01 (раскрытие данных) | `supabase/migrations/20261016191017_rls_policies.sql:29`, `:69-73`; `src/api/supabaseApi.ts:12` | Инфо | Принято по замыслу |
@@ -51,7 +51,7 @@
 
 `validateBooking` (`src/utils/bookings.ts:30-60`) запрещает начало в прошлом и бронь через полночь. В БД из правил времени есть только `ends_at > starts_at` и запрет пересечений. Вошедший пользователь может напрямую через REST создать бронь на месяцы вперёд или задним числом и тем самым занять комнату для всех. Права при этом не нарушаются: бронь его собственная, но клиентские правила обходятся.
 
-**Исправление** (`supabase/migrations/20261017093831_harden_bookings_profiles.sql`, к БД не применялась). Триггер `bookings_validate_time` (`BEFORE INSERT OR UPDATE OF starts_at, ends_at`) с функцией `validate_booking_time()` повторяет правила `validateBooking` и добавляет ограничение длительности:
+**Исправление** (`supabase/migrations/20261017093831_harden_bookings_profiles.sql`, применена к БД). Триггер `bookings_validate_time` (`BEFORE INSERT OR UPDATE OF starts_at, ends_at`) с функцией `validate_booking_time()` повторяет правила `validateBooking` и добавляет ограничение длительности:
 
 - конец позже начала;
 - длительность не больше 8 часов. Этого правила в клиенте нет: форма пропустит такую бронь, а сервер отклонит её с общим сообщением «Проверьте введённые данные»;
@@ -60,7 +60,7 @@
 
 Ошибки бросаются с `errcode '23514'` и текстами из `BOOKING_ERROR_MESSAGES`. PostgREST отвечает на них 400, `appError.ts` относит их к `validation` (тест «23514, класс 22 и 400 → validation» уже есть). Существующие строки триггер не проверяет.
 
-Не проверено: миграция не выполнялась ни локально (Docker нет), ни в облаке. SQL проверен только чтением.
+Проверка: пользователь применил миграцию и вручную выполнил блок 3 `docs/hw6/harden_check.sql` в SQL Editor. Бронь в прошлом, бронь длиннее 8 часов и бронь через полночь отклонены с 23514, корректная бронь проходит ([docs/hw6/harden_check_result.md](docs/hw6/harden_check_result.md)). Не проверялись: правило для UPDATE и проверки 19–21 дымового теста через REST.
 
 ### S-03. GRANT UPDATE, которым клиент не пользуется
 
@@ -68,11 +68,13 @@
 
 **Исправление для `profiles`** (`supabase/migrations/20261017093831_harden_bookings_profiles.sql`). По коду клиент `profiles` не обновляет: в `src/` нет ни `.update(`, ни `updateUser`. Поэтому `UPDATE (display_name, avatar_url)` отозван у `authenticated`, а политика `profiles_update_own` удалена. Имя и аватар задаёт только триггер `handle_new_user` при первом входе. `UPDATE` на `bookings` оставлен: задача касалась только `profiles`. Изменения времени через него теперь проверяет триггер из S-02.
 
+Проверка: на реальной БД `UPDATE` своего профиля от `authenticated` дал `42501: permission denied for table profiles` (проверка 5 в [docs/hw6/harden_check_result.md](docs/hw6/harden_check_result.md)).
+
 ### S-04. Нет проверки формата `avatar_url` и не ограничена длина в `profiles`
 
 У `display_name` есть CHECK на длину 1–100, у `avatar_url` нет ни длины, ни схемы URL. Сейчас `profiles.avatar_url` клиент не запрашивает: аватар в шапке берётся из `user_metadata` собственной сессии (`src/hooks/useAuth.ts:42`, `src/components/AuthBar.tsx:40`). Поэтому подставить картинку другому пользователю нельзя. Риск появится, если аватары авторов начнут выводиться в расписании. Рекомендация: `check (avatar_url is null or avatar_url ~ '^https://')` и ограничение длины.
 
-**Исправление** (`supabase/migrations/20261017093831_harden_bookings_profiles.sql`). Добавлен CHECK `profiles_avatar_url_https`: `avatar_url` либо `null`, либо начинается с `https://` и не длиннее 500 символов. Если в БД уже есть неподходящие строки, `ALTER TABLE` упадёт. Поэтому CHECK стоит в миграции первым, а запрос для проверки до применения лежит в `docs/hw6/harden_check.sql` (блок 1). `handle_new_user` пересоздан: неподходящий аватар он записывает как `null`, а не роняет вход. GitHub отдаёт аватары с `https://avatars.githubusercontent.com`, эти URL правилу удовлетворяют. Существующие строки не проверялись: доступа к БД у ИИ-агента нет.
+**Исправление** (`supabase/migrations/20261017093831_harden_bookings_profiles.sql`). Добавлен CHECK `profiles_avatar_url_https`: `avatar_url` либо `null`, либо начинается с `https://` и не длиннее 500 символов. Если в БД уже есть неподходящие строки, `ALTER TABLE` упадёт. Поэтому CHECK стоит в миграции первым, а запрос для проверки до применения лежит в `docs/hw6/harden_check.sql` (блок 1). `handle_new_user` пересоздан: неподходящий аватар он записывает как `null`, а не роняет вход. GitHub отдаёт аватары с `https://avatars.githubusercontent.com`, эти URL правилу удовлетворяют. Миграция применилась, значит, существующие строки CHECK прошли: иначе `ALTER TABLE` упал бы. Проверка: на реальной БД `http://…` и URL длиннее 500 символов отклонены с 23514 (проверки 6–7 в [docs/hw6/harden_check_result.md](docs/hw6/harden_check_result.md)).
 
 ### S-05. Actions подключены по мажорному тегу, а не по SHA
 
@@ -139,7 +141,7 @@
 
 ## Остаточные риски и рекомендации
 
-1. Применить миграцию `20261017093831_harden_bookings_profiles.sql` (S-02–S-04) и проверить её: `docs/hw6/harden_check.sql` в SQL Editor и проверки 19–22 дымового теста с `ACCESS_TOKEN`.
+1. Миграция S-02–S-04 применена и проверена в SQL Editor. Осталось прогнать проверки 19–22 дымового теста с `ACCESS_TOKEN`.
 2. Добавить в `validateBooking` предел 8 часов, а «один день» считать по `Europe/Moscow`, как на сервере. Иначе пользователь увидит общее сообщение вместо точной причины. Решить, нужен ли `UPDATE` на `bookings` (S-03).
 3. После деплоя на Vercel проверить заголовки (`curl -I`) и вход через GitHub с CSP. При подключении Метрики и Google расширить CSP по списку выше.
 4. Закрепить actions по SHA и включить Dependabot для npm и GitHub Actions (S-05).
