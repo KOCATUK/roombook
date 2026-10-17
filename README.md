@@ -6,6 +6,48 @@
 
 Устройство backend, развёртывание, права, эндпоинты и ограничения описаны в [backend_documentation.md](backend_documentation.md).
 
+## ДЗ6
+
+Приложение: https://roombook-myp1.vercel.app. Деплоится на Vercel автоматически при пуше в `main`.
+
+Что добавлено:
+- CI на GitHub Actions;
+- заголовки безопасности и CSP (`vercel.json`);
+- серверная проверка правил брони (миграция `20261017093831_harden_bookings_profiles.sql`);
+- Google Analytics 4;
+- `/api/health` для мониторинга UptimeRobot;
+- JSON-логи и `/api/log`;
+- разделение бандла и кэш для `/assets`.
+
+Документы:
+- [integration_documentation.md](integration_documentation.md): CI/CD, деплой, интеграции, мониторинг, логирование, использование ИИ, ограничения
+- [security_audit.md](security_audit.md): аудит безопасности по OWASP Top 10
+- [docs/hw6/integration_test_checklist.md](docs/hw6/integration_test_checklist.md): чек-лист проверки интеграций
+- [docs/hw6/optimization.md](docs/hw6/optimization.md): анализ бандла и замеры до и после
+- [docs/hw6/monitoring_incident.md](docs/hw6/monitoring_incident.md): инцидент UptimeRobot 405
+- [docs/hw6/log_analysis/log_analysis.md](docs/hw6/log_analysis/log_analysis.md): анализ логов Supabase с ИИ
+- [docs/hw6/harden_check.sql](docs/hw6/harden_check.sql) и [harden_check_result.md](docs/hw6/harden_check_result.md): проверка миграции на реальной БД
+- [docs/hw6/npm_audit.txt](docs/hw6/npm_audit.txt): вывод `npm audit`
+
+Проверки, те же, что в CI (`.github/workflows/ci.yml`):
+
+```sh
+npm ci
+npm run lint
+npx --no-install tsc -b
+npm test
+npm run build
+npm audit --audit-level=high
+```
+
+Проверка развёрнутого приложения:
+
+```sh
+curl -i https://roombook-myp1.vercel.app/api/health   # GET: JSON со статусом Supabase и версией (коммитом)
+curl -I https://roombook-myp1.vercel.app/api/health   # HEAD: как у UptimeRobot
+curl -I https://roombook-myp1.vercel.app/             # заголовки безопасности и CSP
+```
+
 ## Backend (ДЗ5)
 
 - **Схема и права:** миграции в `supabase/migrations/`, таблицы `rooms`, `bookings` и `profiles`. Права заданы явными GRANT и политиками RLS. Пересечение броней запрещает сама БД (исключающее ограничение `bookings_no_overlap`, интервал `[)`).
