@@ -1,6 +1,17 @@
 # RoomBook
 
-Одностраничное веб-приложение для бронирования переговорных комнат: каталог комнат с текущим статусом, форма брони с проверкой пересечений и расписание комнаты с отменой брони. Сервера пока нет: данные отдаёт mock API в памяти браузера (`src/api/mockApi.ts`), поэтому после перезагрузки страницы брони сбрасываются к демо-данным.
+Одностраничное веб-приложение для бронирования переговорных комнат: каталог комнат с текущим статусом, форма брони с проверкой пересечений и расписание комнаты с отменой брони.
+
+С ДЗ5 данные хранятся в Supabase: Postgres с RLS, REST через PostgREST, вход через GitHub. Смотреть расписание можно без входа, а создавать и отменять свои брони — только после входа. Без настроенного Supabase (или с параметром `?scenario=…` в адресе) приложение работает на mock API из ДЗ4 в памяти браузера (`src/api/mockApi.ts`). В этом режиме после перезагрузки страницы брони сбрасываются к демо-данным.
+
+Устройство backend, развёртывание, права, эндпоинты и ограничения описаны в [backend_documentation.md](backend_documentation.md).
+
+## Backend (ДЗ5)
+
+- **Схема и права:** миграции в `supabase/migrations/`, таблицы `rooms`, `bookings` и `profiles`. Права заданы явными GRANT и политиками RLS. Пересечение броней запрещает сама БД (исключающее ограничение `bookings_no_overlap`, интервал `[)`).
+- **Вход:** GitHub OAuth через Supabase Auth (PKCE). Профиль автора создаёт триггер при первом входе.
+- **Клиент:** `src/lib/supabase.ts`, `src/api/supabaseApi.ts`. Ошибки сводятся к `AppError` (`src/api/appError.ts`).
+- **Проверка API:** дымовой тест `scripts/api-smoke.mjs` (см. ниже).
 
 ## Функции ДЗ4
 
@@ -32,14 +43,35 @@
 
 ```sh
 npm install
+cp .env.example .env.local   # в Windows CMD: copy .env.example .env.local
 npm run dev
 ```
 
-Dev-сервер стартует на http://127.0.0.1:5173 (именно `127.0.0.1`, а не `localhost`) и открывает браузер. Порт фиксирован (`--strictPort`): если 5173 занят, сервер не запустится.
+Dev-сервер стартует на http://127.0.0.1:5173 (именно `127.0.0.1`, а не `localhost`) и открывает браузер. Порт фиксирован (`--strictPort`): если 5173 занят, сервер не запустится. Для входа через GitHub адрес `http://127.0.0.1:5173` должен быть в Redirect URLs проекта Supabase. Как создать проект с нуля, описано в [backend_documentation.md](backend_documentation.md#развёртывание-с-нуля).
+
+Если `.env.local` не заполнен, приложение запустится на mock API, без входа и без сервера.
+
+## Переменные окружения
+
+Файл `.env.local` в корне не попадает в git (правило `*.local` в `.gitignore`), шаблон для него — `.env.example`.
+
+| Переменная | Где взять | Секрет? |
+|---|---|---|
+| `VITE_SUPABASE_URL` | Supabase → Project Settings → API → Project URL | Нет: попадает в сборку |
+| `VITE_SUPABASE_ANON_KEY` | Supabase → Project Settings → API → ключ anon / publishable | Нет, по замыслу: попадает в сборку, данные защищает RLS |
+
+Ключ `service_role` (secret) приложению не нужен. Не кладите его в `.env.local` и в переменные `VITE_*`.
+
+Только для дымового теста, задаются в консоли, а не в файле:
+
+| Переменная | Зачем |
+|---|---|
+| `ACCESS_TOKEN` | JWT вошедшего пользователя. Без него проверки со входом получают SKIP. |
+| `FOREIGN_BOOKING_ID` | id брони другого пользователя для проверки, что RLS скрывает чужие брони |
 
 ## Сценарии mock API
 
-Сценарий выбирается параметром адреса, например http://127.0.0.1:5173/?scenario=slow. Без параметра или с неизвестным значением действует `ok`.
+Сценарий выбирается параметром адреса, например http://127.0.0.1:5173/?scenario=slow. Параметр `scenario` включает mock API, даже если Supabase настроен. Если данные идут из mock API, без параметра или с неизвестным значением действует `ok`.
 
 | Сценарий | Что происходит |
 |---|---|
@@ -59,17 +91,26 @@ npm run lint    # ESLint
 npm run build   # проверка типов (tsc -b) и production-сборка Vite в dist/
 ```
 
-Тесты лежат рядом с кодом (`*.test.ts`, `*.test.tsx`): проверка интервалов в `validateBooking`, конфликт в mock API, карточка комнаты, форма брони, отмена в расписании и сквозные сценарии в `App`.
+Тесты лежат рядом с кодом (`*.test.ts`, `*.test.tsx`): проверка интервалов в `validateBooking`, конфликт в mock API, карточка комнаты, форма брони, отмена в расписании и сквозные сценарии в `App`. С ДЗ5 добавлены тесты выбора источника данных, преобразования строк БД (`mappers`) и классификации ошибок (`AppError`). Vitest обнуляет `VITE_SUPABASE_*` (`vite.config.ts`), поэтому тесты всегда идут в mock API и не ходят в сеть.
+
+Дымовой тест REST API и RLS против настоящего Supabase (Node без зависимостей):
+
+```sh
+node --env-file=.env.local scripts/api-smoke.mjs
+```
+
+Без `ACCESS_TOKEN` выполняются только гостевые проверки. Скрипт печатает PASS/FAIL/WARN/SKIP с `sb-request-id`, удаляет созданные брони и завершается с кодом 1 при FAIL.
 
 ## Структура `src/`
 
 ```
 src/
-├── api/            mock API: getRooms, getBookings, createBooking, cancelBooking, ApiError
-├── components/     RoomCard, BookingForm, BookingList, общие классы Tailwind (classNames.ts)
+├── api/            api.ts (выбор mock или Supabase), mockApi, supabaseApi, mappers, AppError
+├── components/     RoomCard, BookingForm, BookingList, AuthBar, SignInPrompt, общие классы Tailwind (classNames.ts)
 │   └── states/     LoadingState, ErrorState, EmptyState
 ├── data/           демо-комнаты и демо-брони
-├── hooks/          useAsync (загрузка с состояниями), useNow (текущее время по минутам)
+├── hooks/          useAsync (загрузка с состояниями), useNow (текущее время по минутам), useAuth (вход через GitHub)
+├── lib/            клиент Supabase, типы таблиц (database.types.ts), logger
 ├── utils/          валидация и поиск броней, работа с датой и временем, сводка по комнатам
 ├── test/           настройка Vitest (jest-dom, cleanup)
 ├── App.tsx         экран: каталог, форма и расписание
@@ -82,3 +123,7 @@ src/
 - [ТЗ на фронтенд ДЗ4](docs/hw4/frontend_spec.md)
 - [Отчёт о разработке ДЗ4](development_report.md)
 - Скриншоты отладки, адаптивности и проверки рефакторинга: [docs/hw4/screens/](docs/hw4/screens/)
+- [Backend на Supabase (ДЗ5)](backend_documentation.md): архитектура, развёртывание, безопасность, эндпоинты, ошибки, ограничения
+- [Разбор логов Supabase](docs/hw5/log_analysis.md) и [плейбук диагностики](docs/hw5/debug_playbook.md)
+- [Что скрыто в журналах и скриншотах ДЗ5](docs/hw5/SANITIZED.md)
+- Скриншоты ДЗ5: [docs/hw5/screens/](docs/hw5/screens/)
