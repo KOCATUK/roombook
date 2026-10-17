@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# Пайплайну нужно только читать код; токену GitHub больше не выдаём
+permissions:
+  contents: read
+
+# Новый пуш в ту же ветку отменяет ещё идущий прогон: результат старого никому не нужен
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # VITE_SUPABASE_* намеренно не задаём: тесты и сборка идут на mock API,
+    # секреты в CI не нужны
+    steps:
+      - uses: actions/checkout@v7
+
+      # Мажорная версия совпадает с локальной (Node 24); engines и .nvmrc в проекте нет
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      # Отдельно от build, чтобы ошибка типов была видна как отдельный шаг.
+      # --no-install: без node_modules npx иначе скачает посторонний пакет tsc
+      - name: Type check
+        run: npx --no-install tsc -b
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      # Аудиту хватает package-lock.json, установка зависимостей не нужна.
+      # Падает на high и critical; ошибку не прячем
+      - name: npm audit
+        run: npm audit --audit-level=high
