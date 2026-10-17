@@ -168,7 +168,7 @@
 > vitest run
 
 
- RUN  v5.0.5 C:/Users/Dumla/Documents/SomeGit/projects/roombook
+ RUN  v5.0.5 C:/Users/<user>/Documents/SomeGit/projects/roombook
 
 
  Test Files  6 passed (6)
