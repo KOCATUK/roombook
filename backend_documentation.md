@@ -94,9 +94,9 @@ GitHub → Settings → Developer settings → OAuth Apps → New OAuth App:
 Supabase: Authentication → URL Configuration.
 
 - **Site URL:** `http://127.0.0.1:5173`.
-- **Redirect URLs:** `http://127.0.0.1:5173`.
+- **Redirect URLs:** в нашем проекте задано `http://127.0.0.1:5173/**`. Шаблон со звёздочками разрешает любой путь на этом адресе.
 
-Клиент передаёт `redirectTo: window.location.origin`, и Auth вернёт пользователя только на адрес из этого списка. Наш вход шёл с `redirect_to=http://127.0.0.1:5173` (адрес на `docs/hw5/screens/github_consent.png`) и прошёл успешно. Адрес `localhost:5173` мы не добавляли и вход с него не проверяли.
+Клиент передаёт `redirectTo: window.location.origin`, то есть `http://127.0.0.1:5173`, и Auth вернёт пользователя только на адрес, который подходит под шаблон из этого списка. Наш вход шёл с `redirect_to=http://127.0.0.1:5173` (адрес на `docs/hw5/screens/github_consent.png`) и прошёл успешно. Адрес `localhost:5173` мы не добавляли и вход с него не проверяли.
 
 ### 5. Клиент
 
@@ -259,6 +259,11 @@ curl.exe -s -i -X DELETE "%URL%/rest/v1/bookings?id=eq.<id>" -H "apikey: %KEY%" 
 - **RLS для чужих строк проверен симуляцией** в SQL Editor: `set_config('request.jwt.claims', …)` и `set local role authenticated` в транзакции с `rollback`. Второго реального пользователя не было, потому что у нас один аккаунт GitHub. Проверки 16–18 дымового теста (`FOREIGN_BOOKING_ID`) через REST не запускались.
 - **Тесты не ходят в реальную сеть.** `vite.config.ts` обнуляет `VITE_SUPABASE_*` для Vitest, поэтому тесты идут в mock API. `supabaseApi.ts` и `useAuth` на настоящем Supabase проверены вручную в браузере (скриншоты `guest_view`, `logged_in`, `logged_out`, `booking_created`, `conflict_error`, `cancel_ok`, `offline_error` в `docs/hw5/screens/`) и дымовым тестом REST.
 - **Не найдена запись API Gateway для `POST /rooms` 403** (проверка 6), хотя ответ пришёл клиенту, а в логе Postgres ошибка есть. Причина не установлена, гипотезы и способы проверки описаны в `docs/hw5/log_analysis.md`, раздел 3.
-- **Бандл вырос с 237 до 460 kB** (gzip 131.66 kB) из-за supabase-js. Ленивая загрузка не делалась.
+- **Размер бандла зависит от окружения сборки.**
+  - С заполненным `.env.local` (приложение ходит в Supabase) JS-бандл весит 460.38 kB (gzip 131.66 kB).
+  - Без `.env.local`, как в свежем клоне, бандл весит 244.85 kB (gzip 76.67 kB).
+  - Рост с 237 до 460 kB относится к сборке с Supabase. Ленивая загрузка supabase-js не делалась.
+  - Что размер зависит именно от наличия `VITE_SUPABASE_*`, проверено. В свежем клоне сборка без переменных дала 244.85 kB, а с фиктивными значениями переменных, без настоящих ключей, — 460.33 kB.
+  - Причина — предположение: по-видимому, Vite исключает supabase-js из сборки, когда переменные не заданы. Отдельно это не проверялось.
 - **Демо-брони остались в базе** после ручных проверок. Тестовые брони дымового теста скрипт удалил (проверка 15).
 - **Журналы и скриншоты санированы.** Идентификатор пользователя, cookie Cloudflare и имя профиля Windows скрыты. Что и где скрыто — в `docs/hw5/SANITIZED.md`.
