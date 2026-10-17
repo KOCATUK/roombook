@@ -21,7 +21,9 @@ describe('toAppError', () => {
   })
 
   it('23P01 → conflict с сообщением о занятом времени', () => {
-    const error = toAppError(postgrestError('23P01'), 'createBooking', 409)
+    // PostgREST отдаёт 23P01 со статусом 400 (видно в логах и Network):
+    // конфликт определяется по коду, иначе 400 дал бы validation
+    const error = toAppError(postgrestError('23P01'), 'createBooking', 400)
     expect(error.kind).toBe('conflict')
     expect(error.message).toBe('Это время уже занято. Выберите другое время')
   })
