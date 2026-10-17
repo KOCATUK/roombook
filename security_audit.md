@@ -104,7 +104,7 @@
 
 | Заголовок | Значение и зачем |
 |---|---|
-| `Content-Security-Policy` | `default-src 'self'`; `script-src 'self'` и `style-src 'self'`: inline-скриптов и стилей в сборке нет (проверено по `dist/index.html` и бандлу); `img-src 'self' https://avatars.githubusercontent.com https://lh3.googleusercontent.com` для аватаров GitHub и Google (вход через Google планируется); `connect-src 'self' https://*.supabase.co` для REST и Auth; `object-src 'none'`, `base-uri 'self'`, `form-action 'self'`, `frame-ancestors 'none'`, `upgrade-insecure-requests` |
+| `Content-Security-Policy` | `default-src 'self'`; `script-src 'self' https://www.googletagmanager.com`: свои скрипты и gtag.js для Google Analytics 4, inline-скриптов нет (gtag подключается из `src/lib/analytics.ts`, проверено по `dist/index.html`); `style-src 'self'`, inline-стилей в сборке нет; `img-src 'self' https://avatars.githubusercontent.com https://lh3.googleusercontent.com https://*.google-analytics.com https://*.googletagmanager.com`: аватары GitHub и Google (вход через Google планируется) и пиксели GA4; `connect-src 'self' https://*.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com`: REST и Auth Supabase, `/api/log` и отправка событий GA4; `object-src 'none'`, `base-uri 'self'`, `form-action 'self'`, `frame-ancestors 'none'`, `upgrade-insecure-requests` |
 | `X-Frame-Options` | `DENY` для старых браузеров, которые не знают `frame-ancestors` |
 | `X-Content-Type-Options` | `nosniff` |
 | `Referrer-Policy` | `strict-origin-when-cross-origin` |
@@ -117,6 +117,7 @@
 - **Яндекс.Метрика:** `https://mc.yandex.ru` в `script-src`, `img-src` и `connect-src`. Для Вебвизора также `frame-src https://mc.yandex.ru` и `https://mc.yandex.com`. Точный список нужно сверить с документацией Метрики на момент подключения.
 - **Вход через Google:** если вход идёт через Supabase Auth (переадресация, как у GitHub), CSP менять не нужно. Переход на страницу входа CSP не ограничивает. Хост аватаров Google `https://lh3.googleusercontent.com` уже есть в `img-src`. Если будет использоваться Google Identity Services (кнопка или One Tap), добавьте `https://accounts.google.com` в `script-src`, `frame-src` и `connect-src`.
 - **Supabase Realtime:** `wss://*.supabase.co` в `connect-src`.
+- **Google Analytics 4** уже подключён (ДЗ6, шаг 4): хосты выше взяты из рекомендаций Google для CSP с GA4. Если включить Google Signals или рекламные функции, понадобятся ещё `https://*.g.doubleclick.net` и `https://www.google.com` (не проверялось). В браузере с действующей CSP отправка событий GA4 не проверялась: тестовый прогон отправил бы событие в реальный счётчик.
 
 **Проверка:**
 
