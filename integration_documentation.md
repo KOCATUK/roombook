@@ -100,7 +100,7 @@
 - В репозитории (`backend_documentation.md`) записано `http://127.0.0.1:5173/**` для разработки.
 - Для прода (источник: пользователь) в Redirect URLs добавлены `https://roombook-myp1.vercel.app/**` и `http://127.0.0.1:5173/**`. Site URL остался `http://127.0.0.1:5173`.
 - Клиент передаёт `redirectTo` равным origin страницы, поэтому на проде Supabase возвращает пользователя на `https://roombook-myp1.vercel.app`: адрес подходит под шаблон из списка.
-- Вход через GitHub на проде работает: проверил пользователь (скриншот `03_vercel_login_ok`).
+- Вход через GitHub на проде работает: проверил пользователь ([03a_vercel_login_ok.png](docs/hw6/screens/03a_vercel_login_ok.png)).
 
 **Профиль** создаёт триггер `handle_new_user` при первом входе. С ДЗ6 `avatar_url` проверяется CHECK-ограничением (`https://`, не длиннее 500 символов; находка S-04).
 
@@ -126,7 +126,7 @@
 
 **Проверка:**
 - логика проверена модульными тестами `src/lib/analytics.test.ts` (агент);
-- события `login`, `booking_created`, `booking_cancelled` в отчёте GA4 «В реальном времени» проверил пользователь (скриншот `09_ga4_realtime`);
+- события `login`, `booking_created`, `booking_cancelled` в отчёте GA4 «В реальном времени» проверил пользователь ([09b_ga4_realtime_events_1.png](docs/hw6/screens/09b_ga4_realtime_events_1.png), [09c_ga4_realtime_events_2.png](docs/hw6/screens/09c_ga4_realtime_events_2.png));
 - `booking_failed` в GA4 не проверялось.
 
 ### OAuth2 и вход через Google
@@ -178,7 +178,7 @@
 | Интервал | 5 минут |
 | Оповещение | e-mail |
 
-Скриншоты пользователя (в репозиторий не добавлены): `10_uptimerobot_monitors`, `10a_uptimerobot_alerts`, `10b_uptimerobot_incident`, `10c_uptimerobot_resolved`.
+Скриншоты пользователя: [10_uptimerobot_monitor_up.png](docs/hw6/screens/10_uptimerobot_monitor_up.png) (монитор Up, 1 инцидент 40 мин 40 с), [10a_uptimerobot_monitor_form.png](docs/hw6/screens/10a_uptimerobot_monitor_form.png) (форма монитора), [10b_uptimerobot_incident_405.png](docs/hw6/screens/10b_uptimerobot_incident_405.png) (инцидент 405). Скриншота закрытого инцидента (Resolved) в наборе нет.
 
 **Инцидент 2026-10-17:**
 - монитор получал `405 Method Not Allowed`: он шлёт HEAD, а функция обрабатывала только GET;
@@ -235,7 +235,7 @@
 
 ### Где смотреть логи
 
-- **Vercel → Logs:** функции `/api/health` и `/api/log`. JSON-строки `/api/health` в панели видны: проверил пользователь (скриншот `08_vercel_logs`). Агент доступа к панели не имел.
+- **Vercel → Logs:** функции `/api/health` и `/api/log`. JSON-строки `/api/health` в панели видны: проверил пользователь ([08_vercel_logs_json.png](docs/hw6/screens/08_vercel_logs_json.png)). Агент доступа к панели не имел.
 - **Supabase → Logs:** шлюз API (REST, Auth) и Postgres.
 
 ### Анализ логов с ИИ
@@ -378,7 +378,7 @@
 - **Дымовой тест:** проверки 19–22 (правила миграции через REST с `ACCESS_TOKEN`) после миграции не запускались. Правила проверены только в SQL Editor (блок 3 `harden_check.sql`). Блоки 1–2 `harden_check.sql` (предпроверка и права) не передавались.
 - **GA4:** событие `booking_failed` в отчётах не проверялось.
 - **Supabase:** лимиты Auth и срок жизни JWT не проверялись. Redirect URLs и Site URL записаны со слов пользователя, агент их в панели не видел.
-- **UptimeRobot:** настройки монитора записаны со слов пользователя и по его скриншотам, агент их не видел.
+- **UptimeRobot:** настройки монитора записаны со слов пользователя и по его скриншотам; в самом UptimeRobot агент их не видел.
 - **Отправка ошибок с клиента:** `error` через `sendBeacon` на проде из браузера не проверялась, есть только модульные тесты.
 - **Кэш браузера:** эффект кэширования в реальном браузере не измерялся, выведен из заголовков и размеров чанков.
 - **Второй проект Vercel:** назначение `roombook` не выяснялось.
@@ -389,4 +389,3 @@
 - **Actions:** не закреплены по SHA (S-05).
 - **Чтения без кэша (L-02):** клиент перечитывает брони и комнаты при каждом действии.
 - **Prettier:** форматирование не проверяется ни локально, ни в CI.
-- **Скриншоты:** `03_vercel_login_ok`, `08_vercel_logs`, `09_ga4_realtime`, `10_uptimerobot_monitors`, `10a_uptimerobot_alerts`, `10b_uptimerobot_incident` и `10c_uptimerobot_resolved` в репозиторий не добавлены.

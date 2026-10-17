@@ -7,7 +7,7 @@
 - **пользователь** — проверку выполнил пользователь вручную, результат взят с его слов или из его файлов;
 - **не проверялось** — в сессии нет данных о проверке.
 
-Скриншоты пользователя (`03_vercel_login_ok`, `08_vercel_logs`, `09_ga4_realtime`) указаны по имени файла; в репозиторий они не добавлены.
+Скриншоты пользователя лежат в [screens/](screens/), подписи к ним — в [screens/README.md](screens/README.md).
 
 ## CI/CD и развёртывание
 
@@ -23,9 +23,9 @@
 
 | # | Что проверяли | Как | Результат | Кто | Файл |
 |---|---|---|---|---|---|
-| 6 | Вход через GitHub на Vercel | Вход на `https://roombook-myp1.vercel.app` через GitHub | Вход выполнен, пользователь в шапке | проверил пользователь вручную | скриншот `03_vercel_login_ok` |
+| 6 | Вход через GitHub на Vercel | Вход на `https://roombook-myp1.vercel.app` через GitHub | Вход выполнен, пользователь в шапке | проверил пользователь вручную | [03a_vercel_login_ok.png](screens/03a_vercel_login_ok.png) |
 | 7 | Логика отправки событий GA4 | Модульные тесты `src/lib/analytics.test.ts` (мок `gtag`) | Событие уходит через `gtag('event', …)` с `room_id` и `error_type`; `gtag.js` подключается один раз, без inline-скрипта; в тестах и в mock-режиме ничего не отправляется | агент | — |
-| 8 | События `login`, `booking_created`, `booking_cancelled` в GA4 | Отчёт GA4 «В реальном времени» после входа, создания и отмены брони на проде | События `login`, `booking_created`, `booking_cancelled` пришли в GA4 | проверил пользователь вручную | скриншот `09_ga4_realtime` |
+| 8 | События `login`, `booking_created`, `booking_cancelled` в GA4 | Отчёт GA4 «В реальном времени» после входа, создания и отмены брони на проде | События `login`, `booking_created`, `booking_cancelled` пришли в GA4 | проверил пользователь вручную | [09b_ga4_realtime_events_1.png](screens/09b_ga4_realtime_events_1.png), [09c_ga4_realtime_events_2.png](screens/09c_ga4_realtime_events_2.png) |
 
 ## API, мониторинг и логи
 
@@ -36,7 +36,7 @@
 | 11 | Инцидент UptimeRobot 405 | Монитор UptimeRobot, воспроизведение через `curl`, исправление, наблюдение за монитором | Причина — нет обработчика HEAD. Инцидент 10:33:15–≈11:13 МСК, 40 мин 40 с, закрыт | пользователь (монитор и закрытие), агент (воспроизведение и исправление) | [monitoring_incident.md](monitoring_incident.md) |
 | 12 | `/api/log` на проде | `curl -X POST` с корректным событием, с `level: info`, затем `GET` | `204`, `400`, `405`. В журналы прода попало одно тестовое событие `warn` с текстом «integration check from agent» | агент | — |
 | 13 | Формат JSON-логов функций | Функции из `api/` собраны в ESM и вызваны в Node; модульные тесты `api/_tests/*.test.ts` | Одна JSON-строка на событие: `ts`, `level`, `msg`, `route`, `request_id`, `latencyMs`; ключей, URL и текстов ошибок в строках нет | агент | — |
-| 14 | JSON-логи `/api/health` в Vercel → Logs | Панель Vercel → Logs | JSON-строки логов `/api/health` видны в панели | проверил пользователь вручную | скриншот `08_vercel_logs` |
+| 14 | JSON-логи `/api/health` в Vercel → Logs | Панель Vercel → Logs | JSON-строки логов `/api/health` видны в панели | проверил пользователь вручную | [08_vercel_logs_json.png](screens/08_vercel_logs_json.png) |
 | 15 | Клиент отправляет `error` через `sendBeacon` на проде | Модульные тесты `src/lib/logger.test.ts` | В тестах: только `error` и только в production. В браузере на проде не проверялось | агент (тесты) | — |
 | 21 | Анализ логов Supabase | Экспорт логов Supabase, обезличенная выгрузка, разбор скриптом `analyze_logs.mjs` | Находки L-01–L-04; по L-01 выход переведён на `scope: 'local'` (`bcf0929`) | проверил пользователь вручную | [log_analysis/log_analysis.md](log_analysis/log_analysis.md) |
 

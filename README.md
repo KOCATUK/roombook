@@ -28,6 +28,7 @@
 - [docs/hw6/log_analysis/log_analysis.md](docs/hw6/log_analysis/log_analysis.md): анализ логов Supabase с ИИ
 - [docs/hw6/harden_check.sql](docs/hw6/harden_check.sql) и [harden_check_result.md](docs/hw6/harden_check_result.md): проверка миграции на реальной БД
 - [docs/hw6/npm_audit.txt](docs/hw6/npm_audit.txt): вывод `npm audit`
+- [docs/hw6/screens/](docs/hw6/screens/): скриншоты ДЗ6, подписи в [README](docs/hw6/screens/README.md)
 
 Проверки, те же, что в CI (`.github/workflows/ci.yml`):
 
