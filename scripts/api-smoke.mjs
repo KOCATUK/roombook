@@ -26,6 +26,10 @@ const AUTH_CHECK_NAMES = [
   '13. PATCH user_id своей брони',
   '14. GET bookings с profiles(display_name)',
   '15. DELETE своих тестовых броней',
+  '19. POST bookings в прошлом',
+  '20. POST bookings длиннее 8 часов',
+  '21. POST bookings через полночь МСК',
+  '22. PATCH avatar_url своего профиля не по https',
 ]
 
 const totals = { PASS: 0, FAIL: 0, WARN: 0, SKIP: 0 }
@@ -192,7 +196,7 @@ async function runAnonChecks() {
   }
 }
 
-async function runAuthChecks(token) {
+async function runAuthChecks(token, ownUserId) {
   console.log('\n— Со входом (ACCESS_TOKEN) —')
 
   const roomInsert = await request('POST', 'rooms', {
@@ -277,6 +281,54 @@ async function runAuthChecks(token) {
     skip('14. GET bookings с profiles(display_name)', 'скрипт не создал ни одной брони')
     skip('15. DELETE своих тестовых броней', 'скрипт не создал ни одной брони')
   }
+
+  await runHardeningChecks(token, ownUserId)
+}
+
+// Правила миграции 20261017093831_harden_bookings_profiles.sql (S-02–S-04).
+// До её применения 19–22 дают FAIL; случайно созданные брони убирает cleanup.
+async function runHardeningChecks(token, ownUserId) {
+  const hourAgo = new Date(Date.now() - 60 * 60 * 1000)
+  const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000)
+  const past = await insertBooking(token, twoHoursAgo.toISOString(), hourAgo.toISOString())
+  trackCreated(past)
+  expectError('19. POST bookings в прошлом', past, '23514', 400)
+
+  // 08:00–17:00 МСК: 9 часов в пределах одного дня
+  const tooLong = await insertBooking(token, '2031-01-02T05:00:00Z', '2031-01-02T14:00:00Z')
+  trackCreated(tooLong)
+  expectError('20. POST bookings длиннее 8 часов', tooLong, '23514', 400)
+
+  // 23:00–01:00 МСК: 2 часа, но конец уже на следующий день
+  const overMidnight = await insertBooking(token, '2031-01-02T20:00:00Z', '2031-01-02T22:00:00Z')
+  trackCreated(overMidnight)
+  expectError('21. POST bookings через полночь МСК', overMidnight, '23514', 400)
+
+  // После миграции UPDATE на profiles отозван, поэтому ждём 42501, а не 23514:
+  // права проверяются раньше CHECK. Сам CHECK проверяется в docs/hw6/harden_check.sql
+  const name = '22. PATCH avatar_url своего профиля не по https'
+  if (!ownUserId) {
+    skip(name, 'в ACCESS_TOKEN нет sub')
+    return
+  }
+  const path = `profiles?id=eq.${ownUserId}`
+  const before = await request('GET', `${path}&select=avatar_url`, { token })
+  const original = rows(before)[0]
+  if (!original) {
+    skip(name, `профиль не найден (HTTP ${before.status}, sb-request-id: ${before.requestId})`)
+    return
+  }
+  const patched = await request('PATCH', path, {
+    token,
+    body: { avatar_url: 'http://example.com/smoke.png' },
+    headers: { Prefer: 'return=representation' },
+  })
+  expectError(name, patched, '42501', 403)
+  // Если сервер всё же принял значение, возвращаем прежний аватар
+  if (rows(patched).length > 0) {
+    const restored = await request('PATCH', path, { token, body: { avatar_url: original.avatar_url } })
+    console.log(`       прежний avatar_url восстановлен: HTTP ${restored.status}, sb-request-id: ${restored.requestId}`)
+  }
 }
 
 async function runForeignChecks(token, ownUserId) {
@@ -360,7 +412,7 @@ async function main() {
     await runAnonChecks()
 
     if (ACCESS_TOKEN) {
-      await runAuthChecks(ACCESS_TOKEN)
+      await runAuthChecks(ACCESS_TOKEN, ownUserId)
     } else {
       console.log('\n— Со входом (ACCESS_TOKEN) —')
       for (const name of AUTH_CHECK_NAMES) skip(name, 'ACCESS_TOKEN не задан')
